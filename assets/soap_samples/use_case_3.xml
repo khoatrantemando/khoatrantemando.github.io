@@ -1,0 +1,80 @@
+<soapenv:Envelope
+        xmlns:soapenv="http://www.w3.org/2003/05/soap-soapenvelope"
+        xmlns:ns1="http://api-demo.temando.com/schema/2009_06/server.xsd"
+        xmlns:ns2="wsse:http://schemas.xmlsoap.org/ws/2002/04/secext">;
+    <soapenv:Header>
+        <Security>
+            <UsernameToken>
+                <Username>TEMANDOTEST</Username>
+                <Password>temandopass1</Password>
+            </UsernameToken>
+        </Security>
+    </soapenv:Header>
+    <soapenv:Body>
+        <ns1:getQuotes>
+            <anythings>
+                <anything>
+                    <class>General Goods</class>
+                    <subclass>Household Goods</subclass>
+                    <packaging>Carton</packaging>
+                    <qualifierFreightGeneralFragile>N</qualifierFreightGeneralFragile>
+                    <distanceMeasurementType>Centimetres</distanceMeasurementType>
+                    <weightMeasurementType>Grams</weightMeasurementType>
+                    <length>28</length>
+                    <width>23</width>
+                    <height>41</height>
+                    <weight>3200</weight>
+                    <quantity>1</quantity>
+                    <description>8T CARTONS: Nokia 2610</description>
+                    <articles>
+                        <article>
+                            <description>Nokia 2610 Phone</description>
+                            <sku>n2610</sku>
+                            <hs>n2610AUUS</hs>
+                            <countryOfOrigin>AU</countryOfOrigin>
+                            <countryOfManufacture>CN</countryOfManufacture>
+                            <composition>100% metal</composition>
+                            <goodsValue>149.99</goodsValue>
+                            <goodsCurrency>EUR</goodsCurrency>
+                        </article>
+                    </articles>
+                </anything>
+            </anythings>
+            <anywhere>
+                <itemNature>International</itemNature>
+                <itemMethod>Door to Door</itemMethod>
+                <originDescription>Temando Gold International</originDescription>
+                <destinationCountry>US</destinationCountry>
+                <destinationCode>89158</destinationCode>
+                <destinationSuburb>LAS VEGAS</destinationSuburb>
+                <destinationIs>Residence</destinationIs>
+                <destinationBusNotifyBefore>N</destinationBusNotifyBefore>
+                <destinationBusLimitedAccess>N</destinationBusLimitedAccess>
+                <originBusNotifyBefore>Y</originBusNotifyBefore>
+            </anywhere>
+            <general>
+                <!-- insurance -->
+                <goodsValue>149.99</goodsValue>
+                <goodsCurrency>EUR</goodsCurrency>
+                <!-- internation requires below as well -->
+                <termsOfTrade>Delivered Duty Unpaid</termsOfTrade>
+            </general>
+            <!-- origin/destination only relevant for quoting when a PO box is a possible address (changes supported carriers) -->
+            <origin>
+                <description>Temando Gold International</description>
+            </origin>
+            <destination>
+                <contactName>Joe Flank</contactName>
+                <companyName/>
+                <street>111 Awesome Street</street>
+                <suburb>LAS VEGAS</suburb>
+                <code>89158</code>
+                <country>US</country>
+                <phone1>555235125</phone1>
+                <phone2/>
+                <fax/>
+                <email>joe@flank.com</email>
+            </destination>
+        </ns1:getQuotes>
+    </soapenv:Body>
+</soapenv:Envelope>

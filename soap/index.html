@@ -1,0 +1,2789 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>SOAP API Reference</title>
+
+    <link href="../assets/stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="../assets/stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      <script src="../assets/javascripts/all.js" type="text/javascript"></script>
+
+  </head>
+
+  <body class="soap soap_index">
+
+  </header>
+  <div class="docs-container">
+
+    <a href="#" id="nav-button">
+      <span >
+        NAV
+         <img src="../assets/images/navbar.png" /> 
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <a href="https://www.temando.com/" target="_self"> <img src="../assets/images/logo.png" /></a>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content row">
+        <h1 id='getting-started'>Getting Started</h1><h2 id='a-idintroductionintroductiona'><a id="introduction">Introduction</a></h2>
+<p>This document is a quick start guide on how to integrate with Temando&rsquo;s SOAP services. </p>
+
+<p>Using these services you can:</p>
+
+<ul>
+<li>Get quotes for shipping a package</li>
+<li>Book a shipment and print a shipping label</li>
+<li>Create manifest documentation </li>
+<li>Track a shipment</li>
+</ul>
+
+<p><strong><em>To use this document, you should have a basic familiarity with software development and web services</em></strong>.</p>
+
+<p>For more details, please refer to the <a href="/assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF" target="_blank">Developer Guide</a></p>
+
+<p>If you have any questions or need help, please feel free to drop us a line at <a href="mailto:api-support@temando.com">api-support@temando.com</a></p>
+
+<h2 id='a-idcommon_processesprocesses-overviewa'><a id="common_processes">Processes Overview</a></h2>
+<p><img src="/assets/images/soap/process_overview.png"/></p>
+
+<p>A common scenario is:</p>
+
+<ul>
+<li>User checks what quotes are available based on particular request parameters.</li>
+<li>User then books in a request with a carrier using one of the available quotes.</li>
+<li>If user account has manifesting set up with the carrier, then user runs <strong>get manifest</strong> to verify all booked shipments are ready for a particular date. This step is optional.</li>
+<li>User runs <strong>confirm manifest</strong> to confirm that all are ready.</li>
+<li>User tracks the items after they have been shipped.</li>
+</ul>
+
+<p>Below are detailed explanation of each of these steps. Note that examples of the actual elements and their values are available within the operation descriptions.</p>
+<h3 id='a-idprocess_getquotesstep-1---get-quotesa'><a id="process_getQuotes">Step 1 - Get Quotes</a></h3>
+<p>The first step is to identify what quotes are available. To achieve this a call must be made to the <a href="#getQuotes">getQuotes</a> operation and provide the particulars of the request that needs to be sent. These particulars are grouped as follows:</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>Anythings</strong></td>
+<td>Details about the item/s to be included in the consignment, including packaging type, dimensions, weights, and articles contained inside the packaging.</td>
+</tr>
+<tr>
+<td><strong>Anywhere</strong></td>
+<td>Details about where the item/s are being sent from/to.</td>
+</tr>
+<tr>
+<td><strong>Anytime</strong></td>
+<td>Details about when the item/s are ready for pickup.</td>
+</tr>
+<tr>
+<td><strong>General</strong></td>
+<td>Other general details about the item/s are being sent (eg. goods value).</td>
+</tr>
+</tbody></table>
+
+<p>Once this operation has been processed, the response will contain a list of available quotes. For each quote returned, the following information is provided:</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>Quote</strong></td>
+<td>General information for the quote, such as price, delivery time, etc.</td>
+</tr>
+<tr>
+<td><strong>Adjustments</strong></td>
+<td>List of adjustments that will be applied based on the payment method used at the booking stage.</td>
+</tr>
+<tr>
+<td><strong>Inclusions</strong></td>
+<td>If there are any inclusions associated with the quote (eg. tracking available, instant booking, etc). These incur no extra expense as they are included in the quote price.</td>
+</tr>
+<tr>
+<td><strong>Extras</strong></td>
+<td>If there are any extras available for the quote (eg. insurance, etc). These are an extra expense and will be added to the quote price if selected in the booking step.</td>
+</tr>
+<tr>
+<td><strong>Carrier</strong></td>
+<td>Information about the carrier service.</td>
+</tr>
+</tbody></table>
+<h3 id='a-idprocesses_makebookingstep-2---make-a-bookinga'><a id="processes_makeBooking">Step 2 - Make a Booking</a></h3>
+<p>Once the available quotes have been provided and the required quote identified, a booking must be made to register the request and the identified quote. To achieve this a call must be made to the <a href="#makeBooking">makeBooking</a> operation. The information required for this call is grouped as follows:</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>Anythings</strong></td>
+<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+</tr>
+<tr>
+<td><strong>Anywhere</strong></td>
+<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+</tr>
+<tr>
+<td><strong>Anytime</strong></td>
+<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+</tr>
+<tr>
+<td><strong>General</strong></td>
+<td>This is the exact same details as what was provided in the <a href="#get-processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+</tr>
+<tr>
+<td><strong>Origin</strong></td>
+<td>The specific details about where an item/s is being sent from or the originating address.</td>
+</tr>
+<tr>
+<td><strong>Destination</strong></td>
+<td>The specific details about where an item/s is being sent to or the final destination address.</td>
+</tr>
+<tr>
+<td><strong>Quote</strong></td>
+<td>This will include: <ul><li>The specific details about the accepted quote.</li><li>The extras to be included with the quote (eg. insurance, etc).</li></ul> These must match exactly with the details provided in the response to the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+</tr>
+<tr>
+<td><strong>Payment</strong></td>
+<td>The payment details for the payment of the quote.</td>
+</tr>
+<tr>
+<td><strong>Instructions</strong></td>
+<td>Delivery instructions that should be communicated to the driver.</td>
+</tr>
+<tr>
+<td><strong>Comments</strong></td>
+<td>General comments relating to the request.</td>
+</tr>
+<tr>
+<td><strong>PromotionCode</strong></td>
+<td>Temando code used for promotional partners.</td>
+</tr>
+</tbody></table>
+
+<p>Once this operation has been processed, the response will contain the following information:</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>Request Id</strong></td>
+<td>The unique Temando id for this booking.</td>
+</tr>
+<tr>
+<td><strong>Booking Number</strong></td>
+<td>The carrier&rsquo;s booking number for the request. This is only provided if it was detailed as an inclusion for the quote that was accepted from step 1.</td>
+</tr>
+<tr>
+<td><strong>Consignment Details</strong></td>
+<td>This will include the consignment number, consignment document and document type. This is only provided if it was detailed as an inclusion for the quote that was accepted from step 1.</td>
+</tr>
+</tbody></table>
+<h3 id='a-idprocesses_manifestingstep-3---get-manifesta'><a id="processes_manifesting">Step 3 - Get Manifest</a></h3>
+<p>Manifesting is the process of confirming a collection of shipments are ready for pick up. This is only available if you have registered your pickup location for manifesting. For further information please see our section on <a href="#what-is-manifesting">What is Manifesting</a>.</p>
+
+<p>Before confirming a manifest it is likely you may want to verify that all shipments which have been booked are actually ready for pickup. The <a href="#getManifest">getManifest</a> operation can be called with the request type <strong>Awaiting Confirmation</strong> to get a list of items that would be confirmed by a <a href="#confirm-manifest">confirmManifest</a> call. Normally this would be physically checked against the items awaiting pick up before confirming the manifest.</p>
+<h3 id='a-idprocesses_confirmmanifeststep-4---confirm-manifesta'><a id="processes_confirmManifest">Step 4 - Confirm Manifest</a></h3>
+<p>Items which are ready for pickup can be confirmed by a call to the <a href="#confirmManifest">confirmManifest</a> operation. Doing so will cause Temando to ask the relevant carrier(s) to dispatch to your location for a pick up. Further, shipments can no longer be cancelled via a Temando API once this has been confirmed, as the carriers have been instructed to pickup the items. Cancellations must be negotiated with the carriers after a manifest has been confirmed. After a manifest is confirmed, it can be retrieved using the <a href="#getManifest">getManifest</a> operation with the request type <strong>Confirmed</strong>.</p>
+<h3 id='a-idprocesses_trackingstep-5---trackinga'><a id="processes_tracking">Step 5 - Tracking</a></h3>
+<p>Tracking the status of a shipment can be performed by making a call to the <a href="#getRequest">getRequest</a> operation. This will return the request and associated details based on the supplied request id. </p>
+
+<p>The <a href="#getRequest">getRequest</a> operation can also be used to retrieve a label in case it wasn&rsquo;t captured in the <a href="#makeBooking">makeBooking</a> response.</p>
+
+<h2 id='a-idsoap_wsdlsoap-wsdla'><a id="soap_wsdl">Soap WSDL</a></h2>
+<p>To invoke the SOAP services, you need to load the wsdl file into your client application.</p>
+
+<p>Temando provides the SOAP services on 2 separate environments.
+You should test with the training environment during your application development / testing phases.
+After you&rsquo;ve completed testing your application against Temando&rsquo;s training environment, your application could be updated to point to Temando&rsquo;s production environment.</p>
+
+<p>The SOAP services wsdl are below:</p>
+
+<table><thead>
+<tr>
+<th>Environment</th>
+<th>Wsdl location</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Training</td>
+<td><a href="http://api-demo.temando.com/schema/2009_06/server.wsdl" target="_blank">http://api-demo.temando.com/schema/2009_06/server.wsdl</a></td>
+</tr>
+<tr>
+<td>Production</td>
+<td><a href="https://api.temando.com/schema/2009_06/server.wsdl" target="_blank">https://api.temando.com/schema/2009_06/server.wsdl</a></td>
+</tr>
+</tbody></table>
+
+<p>Training wsdl and production wsdl are almost the same, except for namespaces (one points to api-demo.temando.com and the other points to api.temando.com)</p>
+
+<h2 id='a-idapi_credentialsapi-credentialsa'><a id="api_credentials">API Credentials</a></h2>
+<p>To make calls to Temando API, you must have a client account with Temando.</p>
+
+<p>Each web service request needs to include the account&rsquo;s user name and password in the request header (see <a href="#api_overview">API Overview</a> for an example of a soap request message).</p>
+
+<p>For the training environment, the below accounts could be used:</p>
+
+<table><thead>
+<tr>
+<th>Client Id</th>
+<th>Username</th>
+<th>Password</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>20420</td>
+<td>TEMANDOTEST</td>
+<td>temandopass1</td>
+</tr>
+<tr>
+<td>59010</td>
+<td>TEMANDOTEST_INSURANCE</td>
+<td>temandopass1</td>
+</tr>
+<tr>
+<td>59012</td>
+<td>TEMANDOTEST_MANIFESTING</td>
+<td>temandopass1</td>
+</tr>
+<tr>
+<td>59014</td>
+<td>TEMANDOTEST_MANIFESTING_INSURANCE</td>
+<td>temandopass1</td>
+</tr>
+</tbody></table>
+
+<p><aside class="warning">
+Note that there is a <a href="https://dashboard-demo.temando.com" target="_blank">Demo Dashboard</a> that allows viewing all bookings against an account.
+As these test accounts are shared, others could also see your test bookings. Please make sure that you do not include any sensitive data in your tests.
+</aside></p>
+
+<p>For production environment, please see the <a href="#create-api-account">FAQ</a></p>
+
+<h1 id='a-idcommon_use_casescommon-use-casesa'><a id="common_use_cases">Common Use Cases</a></h1><h2 id='use-case-1'>Use Case 1</h2>
+<p><strong>Getting quotes for a box to be sent from Brisbane to Melbourne.</strong></p>
+
+<p>The full request xml could be found <a href="/assets/soap_samples/use_case_1.xml" target="_blank">here</a>.</p>
+<h2 id='use-case-2'>Use Case 2</h2>
+<p><strong>Getting quotes from the list of input carriers, for 2 packages, with packaging optimisation turned on.</strong></p>
+
+<p>The full request xml could be found <a href="/assets/soap_samples/use_case_2.xml" target="_blank">here</a>.</p>
+
+<p>A few things worth noting about this request:</p>
+<h3 id='anythings'>anythings</h3>
+<blockquote>
+<p>anythings</p>
+</blockquote>
+<pre class="highlight xml"><span class="nt">&lt;anythings&gt;</span>
+    <span class="nt">&lt;anything&gt;</span>
+        <span class="nt">&lt;class&gt;</span>Freight<span class="nt">&lt;/class&gt;</span>
+        <span class="nt">&lt;mode&gt;</span>Less than load<span class="nt">&lt;/mode&gt;</span>
+        <span class="nt">&lt;packaging&gt;</span>Box<span class="nt">&lt;/packaging&gt;</span>
+        <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+        <span class="nt">&lt;weightMeasurementType&gt;</span>Grams<span class="nt">&lt;/weightMeasurementType&gt;</span>
+        <span class="nt">&lt;length&gt;</span>18<span class="nt">&lt;/length&gt;</span>
+        <span class="nt">&lt;width&gt;</span>23<span class="nt">&lt;/width&gt;</span>
+        <span class="nt">&lt;height&gt;</span>16<span class="nt">&lt;/height&gt;</span>
+        <span class="nt">&lt;weight&gt;</span>180<span class="nt">&lt;/weight&gt;</span>
+        <span class="nt">&lt;packagingOptimisation&gt;</span>Y<span class="nt">&lt;/packagingOptimisation&gt;</span>
+        <span class="nt">&lt;quantity&gt;</span>1<span class="nt">&lt;/quantity&gt;</span>
+        <span class="nt">&lt;articles&gt;</span>
+            <span class="nt">&lt;article&gt;</span>
+                <span class="nt">&lt;description&gt;</span>Baby Pooh Led Magic Night Light<span class="nt">&lt;/description&gt;</span>
+                <span class="nt">&lt;sku&gt;</span>6767508<span class="nt">&lt;/sku&gt;</span>
+            <span class="nt">&lt;/article&gt;</span>
+        <span class="nt">&lt;/articles&gt;</span>
+    <span class="nt">&lt;/anything&gt;</span>
+    <span class="nt">&lt;anything&gt;</span>
+        <span class="nt">&lt;class&gt;</span>Freight<span class="nt">&lt;/class&gt;</span>
+        <span class="nt">&lt;mode&gt;</span>Less than load<span class="nt">&lt;/mode&gt;</span>
+        <span class="nt">&lt;packaging&gt;</span>Box<span class="nt">&lt;/packaging&gt;</span>
+        <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+        <span class="nt">&lt;weightMeasurementType&gt;</span>Grams<span class="nt">&lt;/weightMeasurementType&gt;</span>
+        <span class="nt">&lt;length&gt;</span>7<span class="nt">&lt;/length&gt;</span>
+        <span class="nt">&lt;width&gt;</span>10<span class="nt">&lt;/width&gt;</span>
+        <span class="nt">&lt;height&gt;</span>25<span class="nt">&lt;/height&gt;</span>
+        <span class="nt">&lt;weight&gt;</span>210<span class="nt">&lt;/weight&gt;</span>
+        <span class="nt">&lt;packagingOptimisation&gt;</span>Y<span class="nt">&lt;/packagingOptimisation&gt;</span>
+        <span class="nt">&lt;quantity&gt;</span>1<span class="nt">&lt;/quantity&gt;</span>
+        <span class="nt">&lt;articles&gt;</span>
+            <span class="nt">&lt;article&gt;</span>
+                <span class="nt">&lt;description&gt;</span>Winnie the Pooh Starry Night Cuddle Robe<span class="nt">&lt;/description&gt;</span>
+                <span class="nt">&lt;sku&gt;</span>3639911<span class="nt">&lt;/sku&gt;</span>
+            <span class="nt">&lt;/article&gt;</span>
+        <span class="nt">&lt;/articles&gt;</span>
+    <span class="nt">&lt;/anything&gt;</span>
+<span class="nt">&lt;/anythings&gt;</span>
+</pre>
+
+<ul>
+<li>The number of articles supplied has to match with the quantity supplied.</li>
+<li>packagingOptimisation is turned on for this quote. When this is the case, the response will include <strong>anythings</strong> with only one <strong>anything</strong> element, which is the packaging that accommodates all items in the request. This <strong>anything</strong> element must be used for the next step <strong>makeBooking</strong> (not <strong>anythings</strong> in the original <strong>getQuotes</strong> request)</li>
+</ul>
+<h3 id='clientid'>clientId</h3>
+<blockquote>
+<p>clientId</p>
+</blockquote>
+<pre class="highlight xml"><span class="nt">&lt;clientId&gt;</span>27937<span class="nt">&lt;/clientId&gt;</span>
+</pre>
+
+<p>This is applicable if you have quoting on behalf of a client.</p>
+<h3 id='quote-filter'>Quote filter</h3>
+<blockquote>
+<p>quoteFilter</p>
+</blockquote>
+<pre class="highlight xml"><span class="nt">&lt;quoteFilter&gt;</span>
+    <span class="nt">&lt;preference&gt;</span>Carriers Only<span class="nt">&lt;/preference&gt;</span>
+    <span class="nt">&lt;carriers&gt;</span>
+        <span class="nt">&lt;carrier&gt;</span>
+            <span class="nt">&lt;carrierId&gt;</span>54381<span class="nt">&lt;/carrierId&gt;</span>
+        <span class="nt">&lt;/carrier&gt;</span>
+    <span class="nt">&lt;/carriers&gt;</span>
+<span class="nt">&lt;/quoteFilter&gt;</span>
+</pre>
+
+<p>There are 3 possible values for <strong>preference</strong>:</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>Cheapest</strong></td>
+<td>Only a single quote be returned, which will be the cheapest quote available. Can be used for getQuotes and makeBooking.</td>
+</tr>
+<tr>
+<td><strong>Carriers Only</strong></td>
+<td>Only those quotes that match with the carrier details supplied in the QuoteFilter. Can be used for getQuotes.</td>
+</tr>
+<tr>
+<td><strong>Carrier Order</strong></td>
+<td>Only a single quote will be returned based off the order of the carrier details supplied in the QuoteFilter, with the first available quote matching the list being used. Can be used for getQuotes and makeBooking.</td>
+</tr>
+</tbody></table>
+<h2 id='use-case-3'>Use Case 3</h2>
+<p><strong>Getting quotes for international shipping.</strong></p>
+
+<blockquote>
+<p>request extract</p>
+</blockquote>
+<pre class="highlight xml"><span class="nt">&lt;ns1:getQuotes&gt;</span>
+    <span class="nt">&lt;anythings&gt;</span>
+        <span class="nt">&lt;anything&gt;</span>
+            <span class="nt">&lt;class&gt;</span>General Goods<span class="nt">&lt;/class&gt;</span>
+            <span class="nt">&lt;subclass&gt;</span>Household Goods<span class="nt">&lt;/subclass&gt;</span>
+            <span class="nt">&lt;packaging&gt;</span>Carton<span class="nt">&lt;/packaging&gt;</span>
+            <span class="nt">&lt;qualifierFreightGeneralFragile&gt;</span>N<span class="nt">&lt;/qualifierFreightGeneralFragile&gt;</span>
+            <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+            <span class="nt">&lt;weightMeasurementType&gt;</span>Grams<span class="nt">&lt;/weightMeasurementType&gt;</span>
+            <span class="nt">&lt;length&gt;</span>28<span class="nt">&lt;/length&gt;</span>
+            <span class="nt">&lt;width&gt;</span>23<span class="nt">&lt;/width&gt;</span>
+            <span class="nt">&lt;height&gt;</span>41<span class="nt">&lt;/height&gt;</span>
+            <span class="nt">&lt;weight&gt;</span>3200<span class="nt">&lt;/weight&gt;</span>
+            <span class="nt">&lt;quantity&gt;</span>1<span class="nt">&lt;/quantity&gt;</span>
+            <span class="nt">&lt;description&gt;</span>8T CARTONS: Nokia 2610<span class="nt">&lt;/description&gt;</span>
+            <span class="nt">&lt;articles&gt;</span>
+                <span class="nt">&lt;article&gt;</span>
+                    <span class="nt">&lt;description&gt;</span>Nokia 2610 Phone<span class="nt">&lt;/description&gt;</span>
+                    <span class="nt">&lt;sku&gt;</span>n2610<span class="nt">&lt;/sku&gt;</span>
+                    <span class="nt">&lt;hs&gt;</span>n2610AUUS<span class="nt">&lt;/hs&gt;</span>
+                    <span class="nt">&lt;countryOfOrigin&gt;</span>AU<span class="nt">&lt;/countryOfOrigin&gt;</span>
+                    <span class="nt">&lt;countryOfManufacture&gt;</span>CN<span class="nt">&lt;/countryOfManufacture&gt;</span>
+                    <span class="nt">&lt;composition&gt;</span>100% metal<span class="nt">&lt;/composition&gt;</span>
+                    <span class="nt">&lt;goodsValue&gt;</span>149.99<span class="nt">&lt;/goodsValue&gt;</span>
+                    <span class="nt">&lt;goodsCurrency&gt;</span>EUR<span class="nt">&lt;/goodsCurrency&gt;</span>
+                <span class="nt">&lt;/article&gt;</span>
+            <span class="nt">&lt;/articles&gt;</span>
+        <span class="nt">&lt;/anything&gt;</span>
+    <span class="nt">&lt;/anythings&gt;</span>
+    <span class="nt">&lt;anywhere&gt;</span>
+        <span class="nt">&lt;itemNature&gt;</span>International<span class="nt">&lt;/itemNature&gt;</span>
+        <span class="nt">&lt;itemMethod&gt;</span>Door to Door<span class="nt">&lt;/itemMethod&gt;</span>
+        <span class="nt">&lt;originDescription&gt;</span>Temando Gold International<span class="nt">&lt;/originDescription&gt;</span>
+        <span class="nt">&lt;destinationCountry&gt;</span>US<span class="nt">&lt;/destinationCountry&gt;</span>
+        <span class="nt">&lt;destinationCode&gt;</span>89158<span class="nt">&lt;/destinationCode&gt;</span>
+        <span class="nt">&lt;destinationSuburb&gt;</span>LAS VEGAS<span class="nt">&lt;/destinationSuburb&gt;</span>
+        <span class="nt">&lt;destinationIs&gt;</span>Residence<span class="nt">&lt;/destinationIs&gt;</span>
+        <span class="nt">&lt;destinationBusNotifyBefore&gt;</span>N<span class="nt">&lt;/destinationBusNotifyBefore&gt;</span>
+        <span class="nt">&lt;destinationBusLimitedAccess&gt;</span>N<span class="nt">&lt;/destinationBusLimitedAccess&gt;</span>
+        <span class="nt">&lt;originBusNotifyBefore&gt;</span>Y<span class="nt">&lt;/originBusNotifyBefore&gt;</span>
+    <span class="nt">&lt;/anywhere&gt;</span>
+    <span class="nt">&lt;general&gt;</span>
+        <span class="c">&lt;!-- insurance --&gt;</span>
+        <span class="nt">&lt;goodsValue&gt;</span>149.99<span class="nt">&lt;/goodsValue&gt;</span>
+        <span class="nt">&lt;goodsCurrency&gt;</span>EUR<span class="nt">&lt;/goodsCurrency&gt;</span>
+        <span class="c">&lt;!-- internation requires below as well --&gt;</span>
+        <span class="nt">&lt;termsOfTrade&gt;</span>Delivered Duty Unpaid<span class="nt">&lt;/termsOfTrade&gt;</span>
+    <span class="nt">&lt;/general&gt;</span>
+<span class="nt">&lt;/ns1:getQuotes&gt;</span>
+</pre>
+
+<p>The full request xml could be found <a href="/assets/soap_samples/use_case_3.xml" target="_blank">here</a>.</p>
+
+<p>For international shipping request:</p>
+
+<ul>
+<li>Each <strong>article</strong> must include goodsValue and goodsCurrency</li>
+<li>The <strong>general</strong> section must include <strong>goodsValue</strong>, <strong>goodsCurrency</strong>, and <strong>termsOfTrade</strong>.</li>
+<li>The sum of <strong>goodsValue</strong> for all <strong>article</strong>s must be equal to <strong>goodsValue</strong> under <strong>general</strong></li>
+</ul>
+
+<h1 id='a-idsample_codesample-codea'><a id="sample_code">Sample Code</a></h1>
+
+<p>Below are sample codes in a number of common languages.
+They are intentionally simple to quickly demonstrate how to connect to Temando SOAP services, and might not follow best coding practices.
+Please modify them to adapt to your project&rsquo;s requirements.</p>
+
+<h2 id='a-idphpaphp'><a id="php"></a>PHP</h2>
+
+<p><a href="../assets/soap_samples/SampleCodePHP.zip">Download PHP Sample Code</a></p>
+
+<h2 id='a-idphpajava'><a id="php"></a>Java</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeJava.zip">Download Java Sample Code</a></p>
+
+<h2 id='a-idc-sharpac-c-sharp'><a id="c-sharp"></a>C# (C Sharp)</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeCS.zip">Download C# (C Sharp) Sample Code</a></p>
+
+<h2 id='a-idaspavb-script-asp'><a id="asp"></a>VB Script (ASP)</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeClassicASP.zip">Download VB Script (ASP) Sample Code</a></p>
+
+<h1 id='a-idterminologyterminologya'><a id="terminology">Terminology</a></h1>
+
+<table><thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Article</td>
+<td>The package to be shipped</td>
+</tr>
+<tr>
+<td>Quote</td>
+<td>An individual quote for a carrier to provide the service.</td>
+</tr>
+<tr>
+<td>Request</td>
+<td>The details of the item/s to be sent.</td>
+</tr>
+<tr>
+<td>Booking</td>
+<td>A quote that has been accepted and payment received.</td>
+</tr>
+<tr>
+<td>Booking Number</td>
+<td>Booking number allocated by the corresponding Carrier for the booking.</td>
+</tr>
+<tr>
+<td>Manifest</td>
+<td>Consolidated list of daily consignment details. For further information please see our section on <a href="#what-is-manifesting">What is Manifesting</a>.</td>
+</tr>
+<tr>
+<td>Carrier</td>
+<td>A transportation company that provides the quote for the transportation of freight.</td>
+</tr>
+<tr>
+<td>Local time</td>
+<td>The local time specified against the user&rsquo;s Temando account.</td>
+</tr>
+<tr>
+<td>GST</td>
+<td>Goods and Services Tax. 10% tax levied on all Australian freight (but not international). Note that the full tax situation is sufficiently complicated to be beyond the scope of this document.</td>
+</tr>
+<tr>
+<td>HTTP</td>
+<td>Hyper Text Transfer Protocol</td>
+</tr>
+<tr>
+<td>SOAP</td>
+<td>Simple Object Access Protocol - A Specification for XML-based communication.</td>
+</tr>
+<tr>
+<td>WSDL</td>
+<td>Web Services Description Language - A specification for describing web services in terms of messages and operations.</td>
+</tr>
+<tr>
+<td>XML</td>
+<td>eXtensible Markup Language - A method of formatting structured data in a way that purports to be human-readable.</td>
+</tr>
+<tr>
+<td>XML Schema</td>
+<td>A data / structure model for XML allowing specification of fully typed complex data structures. The schemas defining the Temando API are available at <a href="http://api.temando.com/schema/2009_06/common.xsd" target="_blank">http://api.temando.com/schema/2009_06/common.xsd</a></td>
+</tr>
+</tbody></table>
+
+<h1 id='a-idfaqfrequently-asked-questionsa'><a id="faq">Frequently Asked Questions</a></h1>
+
+<p class="question"><a id="what-is-manifesting">What is Manifesting?</a></p>
+
+<p>Manifesting is a service we can specifically enable for clients who have agreed to / meet certain volumes of freight and / or have arranged a permanent pick-up in place.  This service needs to be activated / enabled on your account per carrier(s) who support the manifesting capability.</p>
+
+<p>From a technical aspect, when <strong>manifesting</strong> is enabled - Temando will store all booked shipments internally with a status of <strong>awaiting collection</strong>. This status is only changed to <strong>complete</strong> when <a href="#confirmManifest">confirmManifest</a> has been called and it is ONLY at this point where we send the carrier the shipment data. When <strong>manifesting</strong> is NOT enabled, each individual booking is parsed immediately to the relevant carriers platform upon the <a href="#makeBooking">makeBooking</a> request.</p>
+
+<p><aside class="notice">
+It is also important to be aware that when <strong>manifesting</strong> is enabled, individual pick-up notifications are NOT sent to the relevant carrier upon the booking request. This therefore means that if a location does not have a permanent pick-up in place, and a shipment is booked with a carrier set to manifesting - there is a very probable possibility that the carrier will not be aware of the booked shipment, thus possibly delaying the collection.
+</aside></p>
+
+<p>Following on from the above, cancelling shipments via the API can only be performed when a shipment has the status of <strong>awaiting collection</strong> (manifesting is enabled &amp; is being stored in Temando). Any booked shipments that have already been parsed to the relevant carrier (ADHOC bookings) will need to be manually cancelled &amp; credited back by the Temando support team liaising with the appropriate carrier (as it is no longer sitting in Temando).</p>
+
+<p>Each <strong>Saved Address</strong> (origin) on your Temando Account should be assigned a unique <strong>Location</strong> entry in your manifesting portal. These are saved and sorted by the unique <strong>Reference</strong> description (which also links manifesting to your API).  The more saved addresses you have (even with the exact same details), the more origin points in your manifesting location list.</p>
+
+<p class="question"><a id="what-is-packaging-optimisation">What is Packaging Optimisation?</a></p>
+
+<p>Temando&rsquo;s packaging logic / optimisation places the consolidated product dimensions, in the most relevant pre-configured package, in the respective Temando account.
+The logic takes into consideration both the spatial &amp; volumetric measurements.</p>
+
+<p>Dimensions of the pre-configured packaging include <em>actual</em> (outside physical dimensions) and <em>available</em> (inside physical dimension). The <em>actual</em> are the dimensions used for calculating freight cost, while <em>available</em> are used to identify available space for packing.</p>
+
+<p>Packaging order (prioritisation) is based off the size of the packaging itself, that is, the smallest packaging will be used first and then incrementally as the packaging sizes increase. This can however be overridden with a priority assignment to the packaging, to enable larger packaging to be used before smaller ones.</p>
+
+<p>Example:</p>
+
+<ul>
+<li>  Box01 configured at 45 x 45 x 35 (L x W x H)</li>
+<li>  The article/product configured with 30 x 20 x 6</li>
+<li>  This order will have a quantity of 10</li>
+</ul>
+
+<p>Temando packaging logic results:</p>
+
+<ul>
+<li>  You can stack 5 boxes high and stay within the 35cm height limit (height of articles is 6cm x 5 boxes), and</li>
+<li>  You can stack another 5 boxes behind the first set and not breach the width of 45cm (two boxes deep is 20cm x 2)</li>
+</ul>
+
+<p><img title="Packacking" alt="Packaging" src="../assets/images/soap/packaging.png" /></p>
+
+<p>Alternatively if you calculate it cubically = Box01 = 45 x 45 x 35 = 70,875 cubic cm&hellip; made up of&hellip;</p>
+
+<ul>
+<li>  10 articles consume 30 x 20 x 6 = 36,000 cubic cm</li>
+<li>  waste above the boxes = 6,000 cubic cm (30 x 40 x 5)</li>
+<li>  waste at the back of the boxes = 5,250 cubic cm (30 x 5 x 35)</li>
+<li>  waste to the right of the boxes = 23,625 cubic cm (15 x 35 x 45)</li>
+</ul>
+
+<p class="question">What is the difference between getQuotes and getQuotesByRequest?</p>
+
+<p>They offer the same functionalities. However, you are advised to use <strong>getQuotes</strong>. Its predecessor <strong>getQuotesByRequest</strong> will be deprecated sometime in the future.</p>
+
+<p class="question">What is the difference between makeBooking and makeBookingByRequest?</p>
+
+<p><strong>makeBooking</strong> is used for domestic shipping whereas <strong>makeBookingByRequest</strong> is used for international shipping.</p>
+
+<p class="question">For the makeBooking response, does Temando provide tracking details like a tracking number or a URL that we can provide to our clients so they can track their item?</p>
+
+<p>The <strong>consignment number</strong> that we provide in the makeBooking response can be used to track the parcels on the carrier&rsquo;s tracking website.</p>
+
+<p>Alternatively the <strong>requestId</strong> that is returned can be used to track the items in <a href="http://www.temando.com/education/track-your-item" target="_blank">Temando portal</a></p>
+
+<p class="question">How do I get a list of registered locations for my account?</p>
+
+<p>You could call <strong>getLocations</strong> service to get this information.</p>
+
+<p class="question" id="create-api-account">How do I create an account to use the API on production?</p>
+
+<p>First, you need to create an account via <a href="https://dashboard.temando.com" target="_blank">our website</a>.
+Once done, on the <em>My Details</em> section you will need to consider which <em>Account Type</em> i.e. payment method you would like to use for your transactions with our API.
+Then please contact the Temando solution manager assigned to your account, and they will sort out the rest.</p>
+
+<p class="question">Is there a quick way to test Temando SOAP API without wring any code?</p>
+
+<p>SoapUI is a well known tool for web service testing. A freeware version (including open source) is available for download from the internet.
+With this tool you will be able to replicate the requests and responses that you will send and receive when using the Temando API from a code base.
+The soapUI tool is available from <a href="http://www.soapui.org/" target="_blank">http://www.soapui.org/</a>.</p>
+
+<p>For help on how to setup SoapUI, please refer to Appendix A in the <a href="/assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF" target="_blank">Developer Guide</a></p>
+
+<h1 id='a-idapi_overviewapi-overviewa'><a id="api_overview">API Overview</a></h1>
+
+<blockquote>
+<p>Example of a soap request message (<a href="#getRequest">getRequest</a> in this instance).</p>
+</blockquote>
+
+<pre class="highlight xml">1.  <span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+2.  <span class="nt">&lt;soapenv:Envelope</span>
+<span class="err">3.</span>           <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+<span class="err">4.</span>           <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+<span class="err">5.</span>           <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+6.      <span class="nt">&lt;soapenv:Header&gt;</span>
+7.          <span class="nt">&lt;wsse:Security</span>
+<span class="err">8.</span>             <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+9.              <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+10.                 <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+11.                 <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+12.             <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+13.         <span class="nt">&lt;/wsse:Security&gt;</span>
+14.     <span class="nt">&lt;/soapenv:Header&gt;</span>
+15.     <span class="nt">&lt;soapenv:Body&gt;</span>
+16.         <span class="nt">&lt;tem:getRequest</span>
+<span class="err">17.</span>           <span class="na">xmlns:tem=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+18.             <span class="nt">&lt;requestId&gt;</span>100000<span class="nt">&lt;/requestId&gt;</span>
+19.             <span class="nt">&lt;detail&gt;</span>Detailed<span class="nt">&lt;/detail&gt;</span>
+20.         <span class="nt">&lt;/tem:getRequest&gt;</span>
+21.     <span class="nt">&lt;/soapenv:Body&gt;</span>
+22. <span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<p>Communication with the API uses a simple request/response protocol based on SOAP requests over a HTTP transport layer. The request message is submitted to the API server with a POST request to the API URI - the server responds with the response message as the content body.</p>
+
+<p>Currently the only recognized header is the WS-Security Security header.</p>
+
+<table><thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Line 1</td>
+<td>XML header declaration (recommended but technically optional . In the absence of a declaration the message is assumed to use XML 1.0 (either 1.0 or 1.1 is supported). If the header is omitted, or is present but specifies no character encoding, the message MUST be encoded in UTF-8. Note that irrespective of the message&rsquo;s encoding, the contents of the message must be mappable to the HP Roman-8 character set. Currently supported character sets are UTF-8, UTF-16 (big or little endian), ISO-8859-1 and US-ASCII.</td>
+</tr>
+<tr>
+<td>Lines 2-5, 22</td>
+<td>SOAP envelope wrapper - top-level document element.</td>
+</tr>
+<tr>
+<td>Lines 6-14</td>
+<td>SOAP headers. must be specified in all requests.</td>
+</tr>
+<tr>
+<td>Liners 15,21</td>
+<td>SOAP body. Contains the actual request message from one of the operations defined in this document.</td>
+</tr>
+<tr>
+<td>Lines 16-20</td>
+<td>Main request body (in this case a getRequest request).</td>
+</tr>
+</tbody></table>
+
+<p>The response body is similar but does not currently include any SOAP headers.</p>
+
+<h2 id='error-handling'>Error Handling</h2>
+
+<p>Errors caused by an invalid request message will generate a SOAP fault in the response body and the operation will have no further effect (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a> for a list of standard fault codes).</p>
+
+<h2 id='a-idauthenticationauser-authentication'><a id="Authentication"></a>User Authentication</h2>
+
+<blockquote>
+<p>Example WS-Security header block (occurs within the SOAP header):</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;wsse:Security</span> <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+        <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+        <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+    <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+<span class="nt">&lt;/wsse:Security&gt;</span>
+</pre>
+
+<blockquote>
+<p>Example authentication fault:</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soap-env:Envelope</span> <span class="na">xmlns:soap-env=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soap-env:Body&gt;</span>
+        <span class="nt">&lt;soap-env:Fault&gt;</span>
+            <span class="nt">&lt;faultcode&gt;</span>soap-env:Err_Access03<span class="nt">&lt;/faultcode&gt;</span>
+            <span class="nt">&lt;faultstring&gt;</span>The login details you have provided are not a valid Username and Password combination.<span class="nt">&lt;/faultstring&gt;</span>
+            <span class="nt">&lt;faultactor&gt;</span>http://www.temando.com/soap<span class="nt">&lt;/faultactor&gt;</span>
+        <span class="nt">&lt;/soap-env:Fault&gt;</span>
+    <span class="nt">&lt;/soap-env:Body&gt;</span>
+<span class="nt">&lt;/soap-env:Envelope&gt;</span>
+</pre>
+
+<p>User authentication is performed using the WS-Security standard SOAP headers, which must be included in every request message. Presently only username/password authentication is supported; however support for SSL certificate based authentication and signed xml are intended for a future release. Users may further be restricted by IP address.</p>
+
+<p>An accepted security header consists of a single Security element containing exactly one <strong>UsernameToken</strong>, which in turn contains <strong>Username</strong> and <strong>Password</strong> elements. The <strong>Username</strong> and <strong>Password</strong> elements in turn supply the user credentials in plain text (for this reason, an SSL connection is required for transport-level security).</p>
+
+<p>If authentication fails for whatever reason, the server will return a <strong>SOAP Fault</strong> indicating the failure as defined within section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>.</p>
+
+<h2 id='general'>General</h2>
+
+<p>There are currently no restrictions or limitations on the service requests themselves or returned data (eg. maximum number of quotes, etc.) but this may change in the future.</p>
+
+<h1 id='a-idcreatelocationcreatelocationa'><a id="createLocation">createLocation</a></h1>
+
+<p>The createLocation operation registers a location that can have attached stock levels, facilities, and carrier account information.</p>
+
+<p>A stored location is required for a range of carriers to associate carrier information with the location.</p>
+
+<p>A stored location could be used as origin or destination location when getting a quote or making a booking, instead of specifying the full address.</p>
+
+<p>All carriers that are set to manifest must book against a stored location and manifest against that stored location.</p>
+
+<p>On success, the response is an empty createLocationResponse.</p>
+
+<p>Otherwise, a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idcreatelocation_requestarequest'><a id="createLocation_Request"></a>Request</h2>
+
+<blockquote>
+<p>createLocation request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"createLocation"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span>
+                <span class="na">minOccurs=</span><span class="s">"0"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"location"</span> <span class="na">type=</span><span class="s">"com:Location"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample createLocation request</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;soapenv:Envelope</span> <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ser=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;Security&gt;</span>
+            <span class="nt">&lt;UsernameToken&gt;</span>
+                <span class="nt">&lt;Username&gt;</span>username<span class="nt">&lt;/Username&gt;</span>
+                <span class="nt">&lt;Password&gt;</span>password<span class="nt">&lt;/Password&gt;</span>
+            <span class="nt">&lt;/UsernameToken&gt;</span>
+        <span class="nt">&lt;/Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;ser:createLocation&gt;</span>
+            <span class="nt">&lt;location&gt;</span>
+                <span class="nt">&lt;description&gt;</span>SYD<span class="nt">&lt;/description&gt;</span>
+                <span class="nt">&lt;clientId&gt;</span>20420<span class="nt">&lt;/clientId&gt;</span>
+                <span class="nt">&lt;type&gt;</span>Origin<span class="nt">&lt;/type&gt;</span>
+                <span class="nt">&lt;contactName&gt;</span>Test Name<span class="nt">&lt;/contactName&gt;</span>
+                <span class="nt">&lt;street&gt;</span>44 Smith Road<span class="nt">&lt;/street&gt;</span>
+                <span class="nt">&lt;suburb&gt;</span>Sydney<span class="nt">&lt;/suburb&gt;</span>
+                <span class="nt">&lt;state&gt;</span>NSW<span class="nt">&lt;/state&gt;</span>
+                <span class="nt">&lt;code&gt;</span>2000<span class="nt">&lt;/code&gt;</span>
+                <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                <span class="nt">&lt;phone1&gt;</span>21212121<span class="nt">&lt;/phone1&gt;</span>
+                <span class="nt">&lt;email&gt;</span>sydneyTest@temando.com<span class="nt">&lt;/email&gt;</span>
+            <span class="nt">&lt;/location&gt;</span>
+        <span class="nt">&lt;/ser:createLocation&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child content</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Required</td>
+<td>The client id of the client&rsquo;s account.</td>
+</tr>
+<tr>
+<td>location</td>
+<td>simple</td>
+<td>Required</td>
+<td>The location description.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idcreatelocation_responsearesponse'><a id="createLocation_Response"></a>Response</h2>
+
+<blockquote>
+<p>Sample createLocation response</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;SOAP-ENV:Envelope</span> <span class="na">xmlns:SOAP-ENV=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ns1=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;SOAP-ENV:Body&gt;</span>
+      <span class="nt">&lt;ns1:createLocationResponse/&gt;</span>
+   <span class="nt">&lt;/SOAP-ENV:Body&gt;</span>
+<span class="nt">&lt;/SOAP-ENV:Envelope&gt;</span>
+</pre>
+
+<p>On success, the response is an empty createLocationResponse.</p>
+
+<h1 id='a-idgetlocationsgetlocationsa'><a id="getLocations">getLocations</a></h1>
+
+<p>The getLocations operation returns a list of locations against a client id. The list could also be filtered by location description location type.</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idgetlocations_requestarequest'><a id="getLocations_Request"></a>Request</h2>
+
+<blockquote>
+<p>getLocations request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getLocations"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span>
+                <span class="na">minOccurs=</span><span class="s">"0"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"description"</span> <span class="na">type=</span><span class="s">"com:LocationName"</span>
+                <span class="na">minOccurs=</span><span class="s">"0"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"type"</span> <span class="na">type=</span><span class="s">"com:LocationPosition"</span>
+                <span class="na">minOccurs=</span><span class="s">"0"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getLocations request</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;soapenv:Envelope</span> <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ser=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;soapenv:Header&gt;</span>
+      <span class="nt">&lt;Security&gt;</span>
+         <span class="nt">&lt;UsernameToken&gt;</span>
+            <span class="nt">&lt;Username&gt;</span>username<span class="nt">&lt;/Username&gt;</span>
+            <span class="nt">&lt;Password&gt;</span>password<span class="nt">&lt;/Password&gt;</span>
+         <span class="nt">&lt;/UsernameToken&gt;</span>
+      <span class="nt">&lt;/Security&gt;</span>
+   <span class="nt">&lt;/soapenv:Header&gt;</span>
+   <span class="nt">&lt;soapenv:Body&gt;</span>
+      <span class="nt">&lt;ser:getLocations&gt;</span>
+<span class="c">&lt;!--         &lt;clientId&gt;&lt;/clientId--&gt;</span>
+<span class="c">&lt;!--         &lt;description&gt;&lt;/description&gt;--&gt;</span>
+         <span class="nt">&lt;type&gt;</span>Origin<span class="nt">&lt;/type&gt;</span>
+      <span class="nt">&lt;/ser:getLocations&gt;</span>
+   <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child content</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The client id of the client&rsquo;s account.</td>
+</tr>
+<tr>
+<td>description</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The location description.</td>
+</tr>
+<tr>
+<td>type</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The location origin.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idgetlocations_responsearesponse'><a id="getLocations_Response"></a>Response</h2>
+
+<blockquote>
+<p>Sample getLocations response</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;SOAP-ENV:Envelope</span> <span class="na">xmlns:SOAP-ENV=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ns1=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;SOAP-ENV:Body&gt;</span>
+      <span class="nt">&lt;ns1:getLocationsResponse&gt;</span>
+         <span class="nt">&lt;locations&gt;</span>
+            <span class="nt">&lt;location&gt;</span>
+               <span class="nt">&lt;description&gt;</span>Sydney Warehouse<span class="nt">&lt;/description&gt;</span>
+               <span class="nt">&lt;type&gt;</span>Origin<span class="nt">&lt;/type&gt;</span>
+               <span class="nt">&lt;contactName&gt;</span>Temando User<span class="nt">&lt;/contactName&gt;</span>
+               <span class="nt">&lt;companyName&gt;</span>Temando<span class="nt">&lt;/companyName&gt;</span>
+               <span class="nt">&lt;street&gt;</span>Level 4, 140 William Street<span class="nt">&lt;/street&gt;</span>
+               <span class="nt">&lt;suburb&gt;</span>WOOLLOOMOOLOO<span class="nt">&lt;/suburb&gt;</span>
+               <span class="nt">&lt;state&gt;</span>NSW<span class="nt">&lt;/state&gt;</span>
+               <span class="nt">&lt;code&gt;</span>2011<span class="nt">&lt;/code&gt;</span>
+               <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+               <span class="nt">&lt;phone1&gt;</span>02 1234 5678<span class="nt">&lt;/phone1&gt;</span>
+               <span class="nt">&lt;phone2/&gt;</span>
+               <span class="nt">&lt;fax/&gt;</span>
+               <span class="nt">&lt;email&gt;</span>sales@temando.com<span class="nt">&lt;/email&gt;</span>
+               <span class="nt">&lt;loadingFacilities&gt;</span>Y<span class="nt">&lt;/loadingFacilities&gt;</span>
+               <span class="nt">&lt;forklift&gt;</span>N<span class="nt">&lt;/forklift&gt;</span>
+               <span class="nt">&lt;dock&gt;</span>N<span class="nt">&lt;/dock&gt;</span>
+               <span class="nt">&lt;limitedAccess&gt;</span>N<span class="nt">&lt;/limitedAccess&gt;</span>
+               <span class="nt">&lt;postalBox&gt;</span>N<span class="nt">&lt;/postalBox&gt;</span>
+               <span class="nt">&lt;auspostMerchantLocationId/&gt;</span>
+               <span class="nt">&lt;auspostLodgementFacility/&gt;</span>
+               <span class="nt">&lt;manifesting&gt;</span>Y<span class="nt">&lt;/manifesting&gt;</span>
+               <span class="nt">&lt;zones/&gt;</span>
+            <span class="nt">&lt;/location&gt;</span>
+         <span class="nt">&lt;/locations&gt;</span>
+      <span class="nt">&lt;/ns1:getLocationsResponse&gt;</span>
+   <span class="nt">&lt;/SOAP-ENV:Body&gt;</span>
+<span class="nt">&lt;/SOAP-ENV:Envelope&gt;</span>
+</pre>
+
+<p>On success, getLocations returns a list of locations against the input criteria.</p>
+
+<h1 id='a-idgetquotesgetquotesa'><a id="getQuotes">getQuotes</a></h1>
+
+<p>The getQuotes operation retrieves all available quotes (automatically generated from a carrier&rsquo;s rate information) based on the supplied request details.</p>
+
+<p>The response is a getQuotesResponse, and contains a list of all available quotes. Quote results are not listed in any particular order.</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idgetquotesarequest'><a id="getQuotes"></a>Request</h2>
+
+<blockquote>
+<p>getQuotes request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getQuotes"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anythings"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xsd:complexType&gt;</span>
+                    <span class="nt">&lt;xsd:sequence&gt;</span>
+                        <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anything"</span> <span class="na">type=</span><span class="s">"com:Anything"</span> <span class="na">maxOccurs=</span><span class="s">"10"</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/xsd:sequence&gt;</span>
+                <span class="nt">&lt;/xsd:complexType&gt;</span>
+            <span class="nt">&lt;/xsd:element&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anywhere"</span> <span class="na">type=</span><span class="s">"com:Anywhere"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anytime"</span> <span class="na">type=</span><span class="s">"com:Anytime"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"general"</span> <span class="na">type=</span><span class="s">"com:General"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"origin"</span> <span class="na">type=</span><span class="s">"com:Location"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"destination"</span> <span class="na">type=</span><span class="s">"com:Location"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getQuotes request</p>
+</blockquote>
+
+<pre class="highlight html">Request quotes for 2 cartons 10 x 10 x 10cm with weight of 1kg, door-to-door, from a business in Brisbane (4000) (with notifications before pick-up) to a business in Sydney (2000) with pickup on 01 July 2009 in the morning.
+</pre>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soapenv:Envelope</span>
+        <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;wsse:Security</span>
+          <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+                <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+                <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+            <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+        <span class="nt">&lt;/wsse:Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;tem:getQuotes</span>
+          <span class="na">xmlns:tem=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;anythings&gt;</span>
+                <span class="nt">&lt;anything&gt;</span>
+                    <span class="nt">&lt;class&gt;</span>Freight<span class="nt">&lt;/class&gt;</span>
+                    <span class="nt">&lt;mode&gt;</span>Less than load<span class="nt">&lt;/mode&gt;</span>
+                    <span class="nt">&lt;packaging&gt;</span>Carton<span class="nt">&lt;/packaging&gt;</span>
+                    <span class="nt">&lt;qualifierFreightGeneralFragile&gt;</span>N<span class="nt">&lt;/qualifierFreightGeneralFragile&gt;</span>
+                    <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+                    <span class="nt">&lt;weightMeasurementType&gt;</span>Kilograms<span class="nt">&lt;/weightMeasurementType&gt;</span>
+                    <span class="nt">&lt;length&gt;</span>10<span class="nt">&lt;/length&gt;</span>
+                    <span class="nt">&lt;width&gt;</span>10<span class="nt">&lt;/width&gt;</span>
+                    <span class="nt">&lt;height&gt;</span>10<span class="nt">&lt;/height&gt;</span>
+                    <span class="nt">&lt;weight&gt;</span>1<span class="nt">&lt;/weight&gt;</span>
+                    <span class="nt">&lt;quantity&gt;</span>2<span class="nt">&lt;/quantity&gt;</span>
+                    <span class="nt">&lt;description&gt;</span>Contains hats.<span class="nt">&lt;/description&gt;</span>
+                <span class="nt">&lt;/anything&gt;</span>
+            <span class="nt">&lt;/anythings&gt;</span>
+            <span class="nt">&lt;anywhere&gt;</span>
+                <span class="nt">&lt;itemNature&gt;</span>Domestic<span class="nt">&lt;/itemNature&gt;</span>
+                <span class="nt">&lt;itemMethod&gt;</span>Door to Door<span class="nt">&lt;/itemMethod&gt;</span>
+                <span class="nt">&lt;originCountry&gt;</span>AU<span class="nt">&lt;/originCountry&gt;</span>
+                <span class="nt">&lt;originCode&gt;</span>4000<span class="nt">&lt;/originCode&gt;</span>
+                <span class="nt">&lt;originSuburb&gt;</span>Brisbane<span class="nt">&lt;/originSuburb&gt;</span>
+                <span class="nt">&lt;destinationCountry&gt;</span>AU<span class="nt">&lt;/destinationCountry&gt;</span>
+                <span class="nt">&lt;destinationCode&gt;</span>2000<span class="nt">&lt;/destinationCode&gt;</span>
+                <span class="nt">&lt;destinationSuburb&gt;</span>Sydney<span class="nt">&lt;/destinationSuburb&gt;</span>
+                <span class="nt">&lt;destinationIs&gt;</span>Residence<span class="nt">&lt;/destinationIs&gt;</span>
+                <span class="nt">&lt;destinationResNotifyBefore&gt;</span>N<span class="nt">&lt;/destinationResNotifyBefore&gt;</span>
+                <span class="nt">&lt;destinationResLimitedAccess&gt;</span>N<span class="nt">&lt;/destinationResLimitedAccess&gt;</span>
+                <span class="nt">&lt;originIs&gt;</span>Business<span class="nt">&lt;/originIs&gt;</span>
+                <span class="nt">&lt;originBusNotifyBefore&gt;</span>Y<span class="nt">&lt;/originBusNotifyBefore&gt;</span>
+                <span class="nt">&lt;originBusLimitedAccess&gt;</span>N<span class="nt">&lt;/originBusLimitedAccess&gt;</span>
+            <span class="nt">&lt;/anywhere&gt;</span>
+            <span class="nt">&lt;anytime&gt;</span>
+                <span class="nt">&lt;readyDate&gt;</span>2009-07-01<span class="nt">&lt;/readyDate&gt;</span>
+                <span class="nt">&lt;readyTime&gt;</span>PM<span class="nt">&lt;/readyTime&gt;</span>
+            <span class="nt">&lt;/anytime&gt;</span>
+            <span class="nt">&lt;general&gt;</span>
+                <span class="nt">&lt;goodsValue&gt;</span>50.00<span class="nt">&lt;/goodsValue&gt;</span>
+            <span class="nt">&lt;/general&gt;</span>
+        <span class="nt">&lt;/tem:getQuotes&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>    
+</pre>
+
+<h3 id='child-content'>Child content</h3>
+
+<p>The full details of a request.  This includes all the details about what is being sent, where it is being sent from and to, and when it is to be sent.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>anythings</td>
+<td>list</td>
+<td>Always</td>
+<td>The details about the item/s being sent. Note that <strong>anything</strong> has a inner element called <strong>packagingOptimisation</strong> to specify whether the supplied details should be used to find an optimal packaging solution. This option only works if predefined packaging types have been stored for the account. For further information, please see our section on <a href="#what-is-packaging-optimisation">What is Packaging Optimisation</a>.</td>
+</tr>
+<tr>
+<td>anywhere</td>
+<td>complex</td>
+<td>Always</td>
+<td>The details about where the item/s are being sent from/to.</td>
+</tr>
+<tr>
+<td>anytime</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The details about when the item/s are being sent. If not specified defaults to the next available date (ie. ASAP).</td>
+</tr>
+<tr>
+<td>general</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The general details about the item/s being sent.</td>
+</tr>
+<tr>
+<td>origin</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The details about where an item/s is being sent from or the originating address.  Any matching values from the anywhere element (if supplied) will override those values supplied in this element.</td>
+</tr>
+<tr>
+<td>destination</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The details about where an item/s is being sent to or the final destination address.  Any matching values from the anywhere element (if supplied) will override those values supplied in this element.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The client id of the client&rsquo;s account.</td>
+</tr>
+</tbody></table>
+
+<p><aside class="notice">
+* Although the Occurs is specified in the XML definition, further restrictions are applied to this field. Detailed in Further Restrictions section below.
+</aside></p>
+
+<h3 id='further-restrictions'>Further Restrictions:</h3>
+
+<p>Further to the restrictions applied by the field&rsquo;s base type and element conditions (eg. minOccurs=&ldquo;0&rdquo;) the following rules will also be applied after the data has passed the XML tests:</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Further restrictions</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clientId</td>
+<td>Only applies and Mandatory for users with API (Affiliate): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idgetquotes-responsearesponse'><a id="getQuotes-Response"></a>Response</h2>
+
+<blockquote>
+<p>getQuotes response schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getQuotesResponse"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:sequence&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"quote"</span> <span class="na">type=</span><span class="s">"com:AvailableQuote"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:sequence&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getQuotes response</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;SOAP-ENV:Envelope</span> <span class="na">xmlns:SOAP-ENV=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ns1=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;SOAP-ENV:Body&gt;</span>
+        <span class="nt">&lt;ns1:getQuotesResponse&gt;</span>
+            <span class="nt">&lt;quotes&gt;</span>
+                <span class="nt">&lt;quote&gt;</span>
+                    <span class="nt">&lt;generated&gt;</span>Automatically<span class="nt">&lt;/generated&gt;</span>
+                    <span class="nt">&lt;accepted&gt;</span>N<span class="nt">&lt;/accepted&gt;</span>
+                    <span class="nt">&lt;totalPrice&gt;</span>256.97<span class="nt">&lt;/totalPrice&gt;</span>
+                    <span class="nt">&lt;basePrice&gt;</span>233.61<span class="nt">&lt;/basePrice&gt;</span>
+                    <span class="nt">&lt;tax&gt;</span>23.36<span class="nt">&lt;/tax&gt;</span>
+                    <span class="nt">&lt;currency&gt;</span>AUD<span class="nt">&lt;/currency&gt;</span>
+                    <span class="nt">&lt;deliveryMethod&gt;</span>Next Flight: Extra Costs Apply for Regional Areas<span class="nt">&lt;/deliveryMethod&gt;</span>
+                    <span class="nt">&lt;usingGeneralRail&gt;</span>N<span class="nt">&lt;/usingGeneralRail&gt;</span>
+                    <span class="nt">&lt;usingGeneralRoad&gt;</span>N<span class="nt">&lt;/usingGeneralRoad&gt;</span>
+                    <span class="nt">&lt;usingGeneralSea&gt;</span>N<span class="nt">&lt;/usingGeneralSea&gt;</span>
+                    <span class="nt">&lt;usingExpressAir&gt;</span>Y<span class="nt">&lt;/usingExpressAir&gt;</span>
+                    <span class="nt">&lt;usingExpressRoad&gt;</span>N<span class="nt">&lt;/usingExpressRoad&gt;</span>
+                    <span class="nt">&lt;etaFrom&gt;</span>1<span class="nt">&lt;/etaFrom&gt;</span>
+                    <span class="nt">&lt;etaTo&gt;</span>1<span class="nt">&lt;/etaTo&gt;</span>
+                    <span class="nt">&lt;guaranteedEta&gt;</span>Y<span class="nt">&lt;/guaranteedEta&gt;</span>
+                    <span class="nt">&lt;adjustments&gt;</span>
+                        <span class="nt">&lt;adjustment&gt;</span>
+                            <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                            <span class="nt">&lt;amount&gt;</span>4.67<span class="nt">&lt;/amount&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>0.47<span class="nt">&lt;/tax&gt;</span>
+                        <span class="nt">&lt;/adjustment&gt;</span>
+                        <span class="nt">&lt;adjustment&gt;</span>
+                            <span class="nt">&lt;description&gt;</span>Credit Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                            <span class="nt">&lt;amount&gt;</span>-4.67<span class="nt">&lt;/amount&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>-0.47<span class="nt">&lt;/tax&gt;</span>
+                        <span class="nt">&lt;/adjustment&gt;</span>
+                    <span class="nt">&lt;/adjustments&gt;</span>
+                    <span class="nt">&lt;inclusions/&gt;</span>
+                    <span class="nt">&lt;extras&gt;</span>
+                        <span class="nt">&lt;extra&gt;</span>
+                            <span class="nt">&lt;summary&gt;</span>Carbon Offset<span class="nt">&lt;/summary&gt;</span>
+                            <span class="nt">&lt;details&gt;</span>Carbon Offset<span class="nt">&lt;/details&gt;</span>
+                            <span class="nt">&lt;totalPrice&gt;</span>0.67<span class="nt">&lt;/totalPrice&gt;</span>
+                            <span class="nt">&lt;basePrice&gt;</span>0.61<span class="nt">&lt;/basePrice&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>0.06<span class="nt">&lt;/tax&gt;</span>
+                            <span class="nt">&lt;adjustments&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>0.01<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                            <span class="nt">&lt;/adjustments&gt;</span>
+                        <span class="nt">&lt;/extra&gt;</span>
+                        <span class="nt">&lt;extra&gt;</span>
+                            <span class="nt">&lt;summary&gt;</span>Footprints<span class="nt">&lt;/summary&gt;</span>
+                            <span class="nt">&lt;details&gt;</span>Footprints<span class="nt">&lt;/details&gt;</span>
+                            <span class="nt">&lt;totalPrice&gt;</span>1<span class="nt">&lt;/totalPrice&gt;</span>
+                            <span class="nt">&lt;basePrice&gt;</span>1<span class="nt">&lt;/basePrice&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>0<span class="nt">&lt;/tax&gt;</span>
+                            <span class="nt">&lt;adjustments&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>0.02<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                            <span class="nt">&lt;/adjustments&gt;</span>
+                        <span class="nt">&lt;/extra&gt;</span>
+                    <span class="nt">&lt;/extras&gt;</span>
+                    <span class="nt">&lt;carrier&gt;</span>
+                        <span class="nt">&lt;id&gt;</span>54405<span class="nt">&lt;/id&gt;</span>
+                        <span class="nt">&lt;companyName&gt;</span>Startrack__<span class="nt">&lt;/companyName&gt;</span>
+                        <span class="nt">&lt;companyContact&gt;</span>Customer Service<span class="nt">&lt;/companyContact&gt;</span>
+                        <span class="nt">&lt;streetAddress&gt;</span>Level 7 440 Elizabeth St<span class="nt">&lt;/streetAddress&gt;</span>
+                        <span class="nt">&lt;streetSuburb&gt;</span>Melbourne<span class="nt">&lt;/streetSuburb&gt;</span>
+                        <span class="nt">&lt;streetCity&gt;</span>Melbourne<span class="nt">&lt;/streetCity&gt;</span>
+                        <span class="nt">&lt;streetState&gt;</span>VIC<span class="nt">&lt;/streetState&gt;</span>
+                        <span class="nt">&lt;streetCode&gt;</span>3000<span class="nt">&lt;/streetCode&gt;</span>
+                        <span class="nt">&lt;streetCountry&gt;</span>AU<span class="nt">&lt;/streetCountry&gt;</span>
+                        <span class="nt">&lt;postalAddress&gt;</span>Level 7 440 Elizabeth St<span class="nt">&lt;/postalAddress&gt;</span>
+                        <span class="nt">&lt;postalSuburb&gt;</span>Melbourne<span class="nt">&lt;/postalSuburb&gt;</span>
+                        <span class="nt">&lt;postalCity&gt;</span>Melbourne<span class="nt">&lt;/postalCity&gt;</span>
+                        <span class="nt">&lt;postalState&gt;</span>VIC<span class="nt">&lt;/postalState&gt;</span>
+                        <span class="nt">&lt;postalCode&gt;</span>3000<span class="nt">&lt;/postalCode&gt;</span>
+                        <span class="nt">&lt;postalCountry&gt;</span>AU<span class="nt">&lt;/postalCountry&gt;</span>
+                        <span class="nt">&lt;phone1&gt;</span>13 12 13<span class="nt">&lt;/phone1&gt;</span>
+                        <span class="nt">&lt;email/&gt;</span>
+                        <span class="nt">&lt;website&gt;</span>http://www.startrack.com.au/<span class="nt">&lt;/website&gt;</span>
+                    <span class="nt">&lt;/carrier&gt;</span>
+                <span class="nt">&lt;/quote&gt;</span>
+            <span class="nt">&lt;/quotes&gt;</span>
+        <span class="nt">&lt;/ns1:getQuotesResponse&gt;</span>
+    <span class="nt">&lt;/SOAP-ENV:Body&gt;</span>
+<span class="nt">&lt;/SOAP-ENV:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>quote</td>
+<td>list</td>
+<td>Any</td>
+<td>A list of available quotes matching a particular request.</td>
+</tr>
+</tbody></table>
+
+<h1 id='a-idmakebookingmakebookinga'><a id="makeBooking">makeBooking</a></h1>
+
+<p>The makeBooking operation creates a request entry in the system, creates and associates a quote and processes a payment.</p>
+
+<p>The response message is a makeBookingResponse, and contains a request id.</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idmakebooking-requestarequest'><a id="makeBooking-Request"></a>Request</h2>
+
+<blockquote>
+<p>makeBooking request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"makeBooking"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anythings"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xsd:complexType&gt;</span>
+                    <span class="nt">&lt;xsd:sequence&gt;</span>
+                        <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anything"</span> <span class="na">type=</span><span class="s">"com:Anything"</span> <span class="na">maxOccurs=</span><span class="s">"10"</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/xsd:sequence&gt;</span>
+                <span class="nt">&lt;/xsd:complexType&gt;</span>
+            <span class="nt">&lt;/xsd:element&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anywhere"</span> <span class="na">type=</span><span class="s">"com:Anywhere"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anytime"</span> <span class="na">type=</span><span class="s">"com:Anytime"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"general"</span> <span class="na">type=</span><span class="s">"com:General"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"origin"</span> <span class="na">type=</span><span class="s">"com:Location"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"destination"</span> <span class="na">type=</span><span class="s">"com:Location"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"quote"</span> <span class="na">type=</span><span class="s">"com:BookingQuote"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"payment"</span> <span class="na">type=</span><span class="s">"com:Payment"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"instructions"</span> <span class="na">type=</span><span class="s">"com:Instructions"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"comments"</span> <span class="na">type=</span><span class="s">"com:Comments"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"reference"</span> <span class="na">type=</span><span class="s">"com:ClientReference"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"promotionCode"</span> <span class="na">type=</span><span class="s">"com:PromotionCode"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelPrinterType"</span> <span class="na">type=</span><span class="s">"com:LabelPrinterType"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample makeBooking request</p>
+</blockquote>
+
+<pre class="highlight html">Book the quote 2 cartons 10 x 10 x 10cm with weight of 1kg, door-to-door, from a business in Brisbane (4000) (with notifications before pick-up) to a business in Sydney (2000) with pickup on 01 July 2009 in the morning.  Payment method is with a account.
+</pre>
+
+<pre class="highlight xml"><span class="nt">&lt;soapenv:Envelope</span> <span class="na">xmlns:ser=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span> <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;Security&gt;</span>
+            <span class="nt">&lt;UsernameToken&gt;</span>
+                <span class="nt">&lt;Username&gt;</span>username<span class="nt">&lt;/Username&gt;</span>
+                <span class="nt">&lt;Password&gt;</span>password<span class="nt">&lt;/Password&gt;</span>
+            <span class="nt">&lt;/UsernameToken&gt;</span>
+        <span class="nt">&lt;/Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;ser:makeBooking&gt;</span>
+            <span class="nt">&lt;anythings&gt;</span>
+                <span class="nt">&lt;anything&gt;</span>
+                    <span class="nt">&lt;class&gt;</span>General Goods<span class="nt">&lt;/class&gt;</span>
+                    <span class="nt">&lt;subclass&gt;</span>Household Goods<span class="nt">&lt;/subclass&gt;</span>
+                    <span class="nt">&lt;packaging&gt;</span>Box<span class="nt">&lt;/packaging&gt;</span>
+                    <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+                    <span class="nt">&lt;weightMeasurementType&gt;</span>Grams<span class="nt">&lt;/weightMeasurementType&gt;</span>
+                    <span class="nt">&lt;length&gt;</span>10<span class="nt">&lt;/length&gt;</span>
+                    <span class="nt">&lt;width&gt;</span>10<span class="nt">&lt;/width&gt;</span>
+                    <span class="nt">&lt;height&gt;</span>10<span class="nt">&lt;/height&gt;</span>
+                    <span class="nt">&lt;weight&gt;</span>1000<span class="nt">&lt;/weight&gt;</span>
+                    <span class="nt">&lt;quantity&gt;</span>1<span class="nt">&lt;/quantity&gt;</span>
+                <span class="nt">&lt;/anything&gt;</span>
+            <span class="nt">&lt;/anythings&gt;</span>
+            <span class="nt">&lt;anywhere&gt;</span>
+                <span class="nt">&lt;itemNature&gt;</span>Domestic<span class="nt">&lt;/itemNature&gt;</span>
+                <span class="nt">&lt;itemMethod&gt;</span>Door to Door<span class="nt">&lt;/itemMethod&gt;</span>
+                <span class="nt">&lt;originCountry&gt;</span>AU<span class="nt">&lt;/originCountry&gt;</span>
+                <span class="nt">&lt;originCode&gt;</span>2000<span class="nt">&lt;/originCode&gt;</span>
+                <span class="nt">&lt;originSuburb&gt;</span>Sydney<span class="nt">&lt;/originSuburb&gt;</span>
+                <span class="nt">&lt;originIs&gt;</span>Residence<span class="nt">&lt;/originIs&gt;</span>
+                <span class="nt">&lt;destinationCountry&gt;</span>AU<span class="nt">&lt;/destinationCountry&gt;</span>
+                <span class="nt">&lt;destinationCode&gt;</span>2000<span class="nt">&lt;/destinationCode&gt;</span>
+                <span class="nt">&lt;destinationSuburb&gt;</span>Sydney<span class="nt">&lt;/destinationSuburb&gt;</span>
+                <span class="nt">&lt;destinationIs&gt;</span>Business<span class="nt">&lt;/destinationIs&gt;</span>
+            <span class="nt">&lt;/anywhere&gt;</span>
+            <span class="nt">&lt;origin&gt;</span>
+                <span class="nt">&lt;contactName&gt;</span>Test Contact<span class="nt">&lt;/contactName&gt;</span>
+                <span class="nt">&lt;companyName&gt;</span>Test Company<span class="nt">&lt;/companyName&gt;</span>
+                <span class="nt">&lt;street&gt;</span>123 Test St<span class="nt">&lt;/street&gt;</span>
+                <span class="nt">&lt;suburb&gt;</span>SYDNEY<span class="nt">&lt;/suburb&gt;</span>
+                <span class="nt">&lt;code&gt;</span>2000<span class="nt">&lt;/code&gt;</span>
+                <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                <span class="nt">&lt;phone1&gt;</span>0000000000<span class="nt">&lt;/phone1&gt;</span>
+                <span class="nt">&lt;phone2/&gt;</span>
+                <span class="nt">&lt;fax/&gt;</span>
+                <span class="nt">&lt;email&gt;</span>test@test.com<span class="nt">&lt;/email&gt;</span>
+            <span class="nt">&lt;/origin&gt;</span>
+            <span class="nt">&lt;destination&gt;</span>
+                <span class="nt">&lt;contactName&gt;</span>Test Contact<span class="nt">&lt;/contactName&gt;</span>
+                <span class="nt">&lt;companyName/&gt;</span>
+                <span class="nt">&lt;street&gt;</span>123 Test St<span class="nt">&lt;/street&gt;</span>
+                <span class="nt">&lt;suburb&gt;</span>SYDNEY<span class="nt">&lt;/suburb&gt;</span>
+                <span class="nt">&lt;code&gt;</span>2000<span class="nt">&lt;/code&gt;</span>
+                <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                <span class="nt">&lt;phone1&gt;</span>0000000000<span class="nt">&lt;/phone1&gt;</span>
+                <span class="nt">&lt;phone2/&gt;</span>
+                <span class="nt">&lt;fax/&gt;</span>
+                <span class="nt">&lt;email&gt;</span>test@test.com<span class="nt">&lt;/email&gt;</span>
+            <span class="nt">&lt;/destination&gt;</span>
+            <span class="nt">&lt;quoteFilter&gt;</span>
+                <span class="nt">&lt;preference&gt;</span>Carriers Only<span class="nt">&lt;/preference&gt;</span>
+                <span class="nt">&lt;carriers&gt;</span>
+                    <span class="nt">&lt;carrier&gt;</span>
+                        <span class="nt">&lt;carrierId&gt;</span>60027<span class="nt">&lt;/carrierId&gt;</span>
+                    <span class="nt">&lt;/carrier&gt;</span>
+                <span class="nt">&lt;/carriers&gt;</span> 
+            <span class="nt">&lt;/quoteFilter&gt;</span>
+            <span class="nt">&lt;payment&gt;</span>
+                <span class="nt">&lt;paymentType&gt;</span>Account<span class="nt">&lt;/paymentType&gt;</span>
+            <span class="nt">&lt;/payment&gt;</span>
+            <span class="nt">&lt;clientId&gt;</span>20420<span class="nt">&lt;/clientId&gt;</span>
+        <span class="nt">&lt;/ser:makeBooking&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<p>The details required to lodge a request and an accepted quote. Also contains the details required for payment processing.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>anythings</td>
+<td>list</td>
+<td>Always</td>
+<td>The details about the item/s being sent.</td>
+</tr>
+<tr>
+<td>anywhere</td>
+<td>complex</td>
+<td>Always</td>
+<td>The details about where the item/s are being sent from/to.</td>
+</tr>
+<tr>
+<td>anytime</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The details about when the item/s are being sent. If not specified defaults to the next available date.</td>
+</tr>
+<tr>
+<td>general</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The general details about the item/s being sent.</td>
+</tr>
+<tr>
+<td>origin</td>
+<td>complex</td>
+<td>Always</td>
+<td>The details about where an item/s is being sent from or the originating address.</td>
+</tr>
+<tr>
+<td>destination</td>
+<td>complex</td>
+<td>Always</td>
+<td>The details about where an item/s is being sent to or the final destination address.</td>
+</tr>
+<tr>
+<td>quote</td>
+<td>complex</td>
+<td>Always</td>
+<td>Specific details about a quote to be accepted.</td>
+</tr>
+<tr>
+<td>payment</td>
+<td>complex</td>
+<td>Always</td>
+<td>The details about the payment for the quote.</td>
+</tr>
+<tr>
+<td>instructions</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Delivery instructions relating to the request.</td>
+</tr>
+<tr>
+<td>comments</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Client comments relating to the request.</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Client reference relating to the request.</td>
+</tr>
+<tr>
+<td>promotionCode</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>Temando code used for promotions or identifying sales representatives.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The client id of the client&rsquo;s account.</td>
+</tr>
+<tr>
+<td>labelPrinterType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of printer that will be used for printing the item label/s.  If no label/s required this element should not be supplied.</td>
+</tr>
+</tbody></table>
+
+<p><aside class="notice">
+* Although the Occurs is specified in the XML definition, further restrictions are applied to this field. Detailed in Further Restrictions section below.
+</aside></p>
+
+<h3 id='further-restrictions'>Further Restrictions:</h3>
+
+<p>Further to the restrictions applied by the field&rsquo;s base type and element conditions (eg. minOccurs=&ldquo;0&rdquo;) the following rules will also be applied after the data has passed the XML tests:</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Further restrictions</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>promotionCode</td>
+<td>Mandatory for users with API (Affiliate): General access rights.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>Only applies and Mandatory for users with API (Affiliate): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idmakebooking-responsearesponse'><a id="makeBooking-Response"></a>Response</h2>
+
+<blockquote>
+<p>makeBooking response schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"makeBookingResponse"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"requestId"</span> <span class="na">type=</span><span class="s">"xsd:positiveInteger"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"bookingNumber"</span> <span class="na">type=</span><span class="s">"com:BookingNumber"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"consignmentNumber"</span> <span class="na">type=</span><span class="s">"com:ConsignmentNumber"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"consignmentDocument"</span> <span class="na">type=</span><span class="s">"com:ConsignmentDocument"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"consignmentDocumentType"</span>
+           <span class="na">type=</span><span class="s">"com:ConsignmentDocumentType"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocument"</span> <span class="na">type=</span><span class="s">"com:LabelDocument"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocumentType"</span>
+           <span class="na">type=</span><span class="s">"com:LabelDocumentType"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"commercialInvoiceDocument"</span>
+           <span class="na">type=</span><span class="s">"com:CommercialInvoiceDocument"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"commercialInvoiceDocumentType"</span>
+           <span class="na">type=</span><span class="s">"com:CommercialInvoiceDocumentType"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"anytime"</span> <span class="na">type=</span><span class="s">"com:Anytime"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"manifestNumber"</span> <span class="na">type=</span><span class="s">"com:ManifestNumber"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"articles"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xsd:complexType&gt;</span>
+                    <span class="nt">&lt;xsd:sequence&gt;</span>
+                        <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"article"</span> <span class="na">type=</span><span class="s">"com:Article"</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/xsd:sequence&gt;</span>
+                <span class="nt">&lt;/xsd:complexType&gt;</span>
+            <span class="nt">&lt;/xsd:element&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample makeBooking response</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;SOAP-ENV:Envelope</span> <span class="na">xmlns:SOAP-ENV=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ns1=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;SOAP-ENV:Body&gt;</span>
+      <span class="nt">&lt;ns1:makeBookingResponse&gt;</span>
+         <span class="nt">&lt;requestId&gt;</span>10008066<span class="nt">&lt;/requestId&gt;</span>
+         <span class="nt">&lt;consignmentNumber&gt;</span>TXN005077978<span class="nt">&lt;/consignmentNumber&gt;</span>
+         <span class="nt">&lt;consignmentDocument&gt;</span>JVBERi0xLjQK (SHORTENED HERE)<span class="nt">&lt;/consignmentDocument&gt;</span>
+         <span class="nt">&lt;consignmentDocumentType&gt;</span>application/pdf<span class="nt">&lt;/consignmentDocumentType&gt;</span>
+         <span class="nt">&lt;anytime&gt;</span>
+            <span class="nt">&lt;readyDate&gt;</span>2015-01-19<span class="nt">&lt;/readyDate&gt;</span>
+            <span class="nt">&lt;readyTime&gt;</span>PM<span class="nt">&lt;/readyTime&gt;</span>
+         <span class="nt">&lt;/anytime&gt;</span>
+         <span class="nt">&lt;quote</span> <span class="na">id=</span><span class="s">"10790112"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;generated&gt;</span>Automatically<span class="nt">&lt;/generated&gt;</span>
+            <span class="nt">&lt;accepted&gt;</span>Y<span class="nt">&lt;/accepted&gt;</span>
+            <span class="nt">&lt;consignmentNumber&gt;</span>TXN005077978<span class="nt">&lt;/consignmentNumber&gt;</span>
+            <span class="nt">&lt;manifestNumber&gt;</span>00070933<span class="nt">&lt;/manifestNumber&gt;</span>
+            <span class="nt">&lt;articles&gt;</span>
+               <span class="nt">&lt;article&gt;</span>
+                  <span class="nt">&lt;anythingIndex&gt;</span>1<span class="nt">&lt;/anythingIndex&gt;</span>
+                  <span class="nt">&lt;articleNumber&gt;</span>11293323005077978001<span class="nt">&lt;/articleNumber&gt;</span>
+               <span class="nt">&lt;/article&gt;</span>
+            <span class="nt">&lt;/articles&gt;</span>
+            <span class="nt">&lt;totalPrice&gt;</span>10.5<span class="nt">&lt;/totalPrice&gt;</span>
+            <span class="nt">&lt;basePrice&gt;</span>9.55<span class="nt">&lt;/basePrice&gt;</span>
+            <span class="nt">&lt;tax&gt;</span>0.95<span class="nt">&lt;/tax&gt;</span>
+            <span class="nt">&lt;currency&gt;</span>AUD<span class="nt">&lt;/currency&gt;</span>
+            <span class="nt">&lt;deliveryMethod&gt;</span>Overnight Express (AIR) - Auth to Leave (ATL)<span class="nt">&lt;/deliveryMethod&gt;</span>
+            <span class="nt">&lt;usingGeneralRail&gt;</span>N<span class="nt">&lt;/usingGeneralRail&gt;</span>
+            <span class="nt">&lt;usingGeneralRoad&gt;</span>N<span class="nt">&lt;/usingGeneralRoad&gt;</span>
+            <span class="nt">&lt;usingGeneralSea&gt;</span>N<span class="nt">&lt;/usingGeneralSea&gt;</span>
+            <span class="nt">&lt;usingExpressAir&gt;</span>Y<span class="nt">&lt;/usingExpressAir&gt;</span>
+            <span class="nt">&lt;usingExpressRoad&gt;</span>N<span class="nt">&lt;/usingExpressRoad&gt;</span>
+            <span class="nt">&lt;etaFrom&gt;</span>1<span class="nt">&lt;/etaFrom&gt;</span>
+            <span class="nt">&lt;etaTo&gt;</span>1<span class="nt">&lt;/etaTo&gt;</span>
+            <span class="nt">&lt;guaranteedEta&gt;</span>N<span class="nt">&lt;/guaranteedEta&gt;</span>
+            <span class="nt">&lt;adjustments&gt;</span>
+               <span class="nt">&lt;adjustment&gt;</span>
+                  <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                  <span class="nt">&lt;amount&gt;</span>0.19<span class="nt">&lt;/amount&gt;</span>
+                  <span class="nt">&lt;tax&gt;</span>0.02<span class="nt">&lt;/tax&gt;</span>
+               <span class="nt">&lt;/adjustment&gt;</span>
+               <span class="nt">&lt;adjustment&gt;</span>
+                  <span class="nt">&lt;description&gt;</span>Credit Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                  <span class="nt">&lt;amount&gt;</span>-0.19<span class="nt">&lt;/amount&gt;</span>
+                  <span class="nt">&lt;tax&gt;</span>-0.02<span class="nt">&lt;/tax&gt;</span>
+               <span class="nt">&lt;/adjustment&gt;</span>
+            <span class="nt">&lt;/adjustments&gt;</span>
+            <span class="nt">&lt;inclusions/&gt;</span>
+            <span class="nt">&lt;extras/&gt;</span>
+            <span class="nt">&lt;carrier&gt;</span>
+               <span class="nt">&lt;id&gt;</span>60027<span class="nt">&lt;/id&gt;</span>
+               <span class="nt">&lt;companyName&gt;</span>TNT - Auth To Leave<span class="nt">&lt;/companyName&gt;</span>
+               <span class="nt">&lt;companyContact&gt;</span>Stewart Seddon<span class="nt">&lt;/companyContact&gt;</span>
+               <span class="nt">&lt;streetAddress&gt;</span>127 Riawena Road<span class="nt">&lt;/streetAddress&gt;</span>
+               <span class="nt">&lt;streetSuburb&gt;</span>Salisbury<span class="nt">&lt;/streetSuburb&gt;</span>
+               <span class="nt">&lt;streetCity&gt;</span>Brisbane<span class="nt">&lt;/streetCity&gt;</span>
+               <span class="nt">&lt;streetState&gt;</span>QLD<span class="nt">&lt;/streetState&gt;</span>
+               <span class="nt">&lt;streetCode&gt;</span>4107<span class="nt">&lt;/streetCode&gt;</span>
+               <span class="nt">&lt;streetCountry&gt;</span>AU<span class="nt">&lt;/streetCountry&gt;</span>
+               <span class="nt">&lt;postalAddress&gt;</span>127 Riawena Road<span class="nt">&lt;/postalAddress&gt;</span>
+               <span class="nt">&lt;postalSuburb&gt;</span>Salisbury<span class="nt">&lt;/postalSuburb&gt;</span>
+               <span class="nt">&lt;postalCity&gt;</span>Brisbane<span class="nt">&lt;/postalCity&gt;</span>
+               <span class="nt">&lt;postalState&gt;</span>QLD<span class="nt">&lt;/postalState&gt;</span>
+               <span class="nt">&lt;postalCode&gt;</span>4107<span class="nt">&lt;/postalCode&gt;</span>
+               <span class="nt">&lt;postalCountry&gt;</span>AU<span class="nt">&lt;/postalCountry&gt;</span>
+               <span class="nt">&lt;phone1&gt;</span>131150<span class="nt">&lt;/phone1&gt;</span>
+               <span class="nt">&lt;email&gt;</span>tntatl@temando.com<span class="nt">&lt;/email&gt;</span>
+               <span class="nt">&lt;website&gt;</span>http://www.tntexpress.com.au/interaction/asps/trackdtl_tntau.asp<span class="nt">&lt;/website&gt;</span>
+            <span class="nt">&lt;/carrier&gt;</span>
+         <span class="nt">&lt;/quote&gt;</span>
+         <span class="nt">&lt;manifestNumber&gt;</span>00070933<span class="nt">&lt;/manifestNumber&gt;</span>
+         <span class="nt">&lt;articles&gt;</span>
+            <span class="nt">&lt;article&gt;</span>
+               <span class="nt">&lt;anythingIndex&gt;</span>1<span class="nt">&lt;/anythingIndex&gt;</span>
+               <span class="nt">&lt;articleNumber&gt;</span>11293323005077978001<span class="nt">&lt;/articleNumber&gt;</span>
+            <span class="nt">&lt;/article&gt;</span>
+         <span class="nt">&lt;/articles&gt;</span>
+      <span class="nt">&lt;/ns1:makeBookingResponse&gt;</span>
+   <span class="nt">&lt;/SOAP-ENV:Body&gt;</span>
+<span class="nt">&lt;/SOAP-ENV:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>requestId</td>
+<td>positiveInteger</td>
+<td>Always</td>
+<td>The request id of the created request.</td>
+</tr>
+<tr>
+<td>bookingNumber</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The carrier&rsquo;s booking number for the request. This is optional as the carrier may be required to manually entering this reference. See section 2.8.2.75 BookingNumber for further details. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>consignmentNumber</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The carrier&rsquo;s consignment number identifies a logical grouping of goods that has been consigned. This is optional as the carrier may be required to manually entering this reference. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>consignmentDocument</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The carrier&rsquo;s consignment document. This is optional as the carrier may not provide a document. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>consignmentDocumentType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of the carrier&rsquo;s consignment document. This is only provided if an entry for the consignmentDocument field is provided. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>labelDocument</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The carrier&rsquo;s label document. This is optional as the carrier may not provide a document. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>labelDocumentType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of the carrier&rsquo;s label document. This is only provided if an entry for the labelDocument field is provided. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>commercialInvoiceDocument</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The commercial invoice required for international deliveries. This is optional as the document is not required for domestic delivery. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>commercialInvoiceDocumentType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of the commercial invoice document. This is only provided if an entry for the commericlaInvoiceDocument field is provided. Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>anytime</td>
+<td>complex</td>
+<td>Optional</td>
+<td>The details about when the item/s are being sent. Only returned if an anytime element was not supplied in the request.</td>
+</tr>
+<tr>
+<td>manifestNumber</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The carrier&rsquo;s manifest number identifies a logical grouping of consignments. This is optional as the carrier may not require this or a number has not yet been assigned (ie. request has not been confirmed for manifesting). Can be retrieve at a later date via the <a href="#getRequest">getRequest</a> call.</td>
+</tr>
+<tr>
+<td>articles</td>
+<td>list</td>
+<td>Optional</td>
+<td>The details about the individual item/s being sent.</td>
+</tr>
+</tbody></table>
+
+<h1 id='a-idgetmanifestgetmanifesta'><a id="getManifest">getManifest</a></h1>
+
+<p>The getManifest operation returns the manifest documents (and label documents, if requested) for all bookings based on the supplied parameters.</p>
+
+<p>The response message is a getManifestResponse, and contains the manifest documents (and label documents, if requested).</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idgetmanifest-requestarequest'><a id="getManifest-Request"></a>Request</h2>
+
+<blockquote>
+<p>getManifest request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getManifest"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"type"</span> <span class="na">type=</span><span class="s">"com:ManifestType"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"carrierId"</span> <span class="na">type=</span><span class="s">"com:CarrierId"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"location"</span> <span class="na">type=</span><span class="s">"com:Location"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"readyDate"</span> <span class="na">type=</span><span class="s">"com:Date"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"lastConfirmed"</span> <span class="na">type=</span><span class="s">"com:YesNoOption"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"listRequests"</span> <span class="na">type=</span><span class="s">"com:YesNoOption"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelPrinterType"</span> <span class="na">type=</span><span class="s">"com:LabelPrinterType"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getManifest request</p>
+</blockquote>
+
+<pre class="highlight html">Get manfiest and labels (for a Thermal printer) for all bookings being sent from the location ABC Suppliers, on the date 1st July, 2009.
+</pre>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soapenv:Envelope</span>
+        <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;wsse:Security</span> <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+                <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+                <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+            <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+        <span class="nt">&lt;/wsse:Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;tem:getManifest</span>
+          <span class="na">xmlns:tem=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;type&gt;</span>Confirmed<span class="nt">&lt;/type&gt;</span>
+            <span class="nt">&lt;location&gt;</span>ABC Suppliers<span class="nt">&lt;/location&gt;</span>
+            <span class="nt">&lt;readyDate&gt;</span>2009-07-01<span class="nt">&lt;/readyDate&gt;</span>
+            <span class="nt">&lt;labelPrinterType&gt;</span>Thermal<span class="nt">&lt;/labelPrinterType&gt;</span>
+        <span class="nt">&lt;/tem:getManifest&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>type</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The type of manifest report to be generated.  Will default to &ldquo;Confirmed&rdquo; if no value is provided.</td>
+</tr>
+<tr>
+<td>carrierId</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The carrier&rsquo;s id for returning only those bookings associated with this carrier.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The client&rsquo;s id for returning only those bookings associated with this client.</td>
+</tr>
+<tr>
+<td>location</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The location description for returning only those bookings associated with this location.</td>
+</tr>
+<tr>
+<td>readyDate</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The ready date for returning only those bookings with a ready date matching this supplied date.</td>
+</tr>
+<tr>
+<td>listRequests</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Whether to return a list of request entries as data values. If no value is supplied this will default to Yes.</td>
+</tr>
+<tr>
+<td>lastConfirmed</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Whether to return only the last confirmed bookings.  If Yes only the last confirmed are returned, if No then all bookings matching the supplied readyDate are returned. If no value is supplied this will default to Yes.</td>
+</tr>
+<tr>
+<td>labelPrinterType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of printer that will be used for printing the item label/s. If no label/s required this element should not be supplied.</td>
+</tr>
+</tbody></table>
+
+<p><aside class="notice">
+* Although the Occurs is specified in the XML definition, further restrictions are applied to this field. Detailed in Further Restrictions section below.
+</aside></p>
+
+<h3 id='further-restrictions'>Further Restrictions:</h3>
+
+<p>Further to the restrictions applied by the field&rsquo;s base type and element conditions (eg. minOccurs=&ldquo;0&rdquo;) the following rules will also be applied after the data has passed the XML tests:</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Further restrictions</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>carrierId</td>
+<td>Only applies for users with API (Client): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>Only applies and Mandatory for users with API (Affiliate): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idgetmanifest-responsearesponse'><a id="getManifest-Response"></a>Response</h2>
+
+<blockquote>
+<p>getManifest response schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getManifestResponse"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"requests"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xsd:complexType&gt;</span>
+                    <span class="nt">&lt;xsd:sequence&gt;</span>
+                        <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"request"</span> <span class="na">type=</span><span class="s">"com:Request"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/xsd:sequence&gt;</span>
+                <span class="nt">&lt;/xsd:complexType&gt;</span>
+            <span class="nt">&lt;/xsd:element&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"manifestDocument"</span> <span class="na">type=</span><span class="s">"com:ManifestDocument"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"manifestDocumentType"</span>
+           <span class="na">type=</span><span class="s">"com:ManifestDocumentType"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocument"</span> <span class="na">type=</span><span class="s">"com:LabelDocument"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocumentType"</span> <span class="na">type=</span><span class="s">"com:LabelDocumentType"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getManifest response</p>
+</blockquote>
+
+<pre class="highlight html">Requests, manfiest and labels for all bookings being sent from the location ABC Suppliers, on the 1st July, 2009.
+</pre>
+
+<pre class="highlight xml"><span class="nt">&lt;soap-env:Envelope</span>
+        <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soap-env:Header/&gt;</span>
+    <span class="nt">&lt;soap-env:Body&gt;</span>
+        <span class="nt">&lt;ns1:getManifestResponse</span>
+          <span class="na">xmlns:ns1=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;requests&gt;</span>
+                <span class="nt">&lt;request</span> <span class="na">id=</span><span class="s">"100000"</span><span class="nt">&gt;</span>
+                    <span class="nt">&lt;status&gt;</span>Completed<span class="nt">&lt;/status&gt;</span>
+                    <span class="nt">&lt;anythings&gt;</span>
+                        <span class="nt">&lt;anything&gt;</span>
+                            <span class="nt">&lt;class&gt;</span>Freight<span class="nt">&lt;/class&gt;</span>
+                            <span class="nt">&lt;mode&gt;</span>Less than load<span class="nt">&lt;/mode&gt;</span>
+                            <span class="nt">&lt;packaging&gt;</span>Carton<span class="nt">&lt;/packaging&gt;</span>
+                            <span class="nt">&lt;qualifierFreightGeneralFragile&gt;</span>N<span class="nt">&lt;/qualifierFreightGeneralFragile&gt;</span>
+                            <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+                            <span class="nt">&lt;weightMeasurementType&gt;</span>Kilograms<span class="nt">&lt;/weightMeasurementType&gt;</span>
+                            <span class="nt">&lt;length&gt;</span>10<span class="nt">&lt;/length&gt;</span>
+                            <span class="nt">&lt;width&gt;</span>10<span class="nt">&lt;/width&gt;</span>
+                            <span class="nt">&lt;height&gt;</span>10<span class="nt">&lt;/height&gt;</span>
+                            <span class="nt">&lt;weight&gt;</span>1<span class="nt">&lt;/weight&gt;</span>
+                            <span class="nt">&lt;quantity&gt;</span>2<span class="nt">&lt;/quantity&gt;</span>
+                            <span class="nt">&lt;description&gt;</span>Contains hats.<span class="nt">&lt;/description&gt;</span>
+                        <span class="nt">&lt;/anything&gt;</span>
+                    <span class="nt">&lt;/anythings&gt;</span>
+                    <span class="nt">&lt;anywhere&gt;</span>
+                        <span class="nt">&lt;itemNature&gt;</span>Domestic<span class="nt">&lt;/itemNature&gt;</span>
+                        <span class="nt">&lt;itemMethod&gt;</span>Door to Door<span class="nt">&lt;/itemMethod&gt;</span>
+                        <span class="nt">&lt;originCountry&gt;</span>AU<span class="nt">&lt;/originCountry&gt;</span>
+                        <span class="nt">&lt;originCode&gt;</span>4000<span class="nt">&lt;/originCode&gt;</span>
+                        <span class="nt">&lt;originSuburb&gt;</span>Brisbane<span class="nt">&lt;/originSuburb&gt;</span>
+                        <span class="nt">&lt;destinationCountry&gt;</span>AU<span class="nt">&lt;/destinationCountry&gt;</span>
+                        <span class="nt">&lt;destinationCode&gt;</span>2000<span class="nt">&lt;/destinationCode&gt;</span>
+                        <span class="nt">&lt;destinationSuburb&gt;</span>Sydney<span class="nt">&lt;/destinationSuburb&gt;</span>
+                        <span class="nt">&lt;destinationIs&gt;</span>Residence<span class="nt">&lt;/destinationIs&gt;</span>
+                        <span class="nt">&lt;destinationResPostalBox&gt;</span>N<span class="nt">&lt;/destinationResPostalBox&gt;</span>
+                        <span class="nt">&lt;destinationResUnattended&gt;</span>N<span class="nt">&lt;/destinationResUnattended&gt;</span>
+                        <span class="nt">&lt;destinationResInside&gt;</span>N<span class="nt">&lt;/destinationResInside&gt;</span>
+                        <span class="nt">&lt;destinationResLimitedAccess&gt;</span>N<span class="nt">&lt;/destinationResLimitedAccess&gt;</span>
+                        <span class="nt">&lt;destinationResHeavyLift&gt;</span>N<span class="nt">&lt;/destinationResHeavyLift&gt;</span>
+                        <span class="nt">&lt;originIs&gt;</span>Business<span class="nt">&lt;/originIs&gt;</span>
+                        <span class="nt">&lt;originBusUnattended&gt;</span>N<span class="nt">&lt;/originBusUnattended&gt;</span>
+                        <span class="nt">&lt;originBusDock&gt;</span>Y<span class="nt">&lt;/originBusDock&gt;</span>
+                        <span class="nt">&lt;originBusForklift&gt;</span>N<span class="nt">&lt;/originBusForklift&gt;</span>
+                        <span class="nt">&lt;originBusLoadingFacilities&gt;</span>N<span class="nt">&lt;/originBusLoadingFacilities&gt;</span>
+                        <span class="nt">&lt;originBusInside&gt;</span>N<span class="nt">&lt;/originBusInside&gt;</span>
+                        <span class="nt">&lt;originBusLimitedAccess&gt;</span>N<span class="nt">&lt;/originBusLimitedAccess&gt;</span>
+                        <span class="nt">&lt;originBusHeavyLift&gt;</span>N<span class="nt">&lt;/originBusHeavyLift&gt;</span>
+                        <span class="nt">&lt;originBusTailgateLifter&gt;</span>N<span class="nt">&lt;/originBusTailgateLifter&gt;</span>
+                        <span class="nt">&lt;originBusContainerSwingLifter&gt;</span>N<span class="nt">&lt;/originBusContainerSwingLifter&gt;</span>
+                    <span class="nt">&lt;/anywhere&gt;</span>
+                    <span class="nt">&lt;anytime&gt;</span>
+                        <span class="nt">&lt;readyDate&gt;</span>2009-07-01<span class="nt">&lt;/readyDate&gt;</span>
+                        <span class="nt">&lt;readyTime&gt;</span>PM<span class="nt">&lt;/readyTime&gt;</span>
+                    <span class="nt">&lt;/anytime&gt;</span>
+                    <span class="nt">&lt;general&gt;</span>
+                        <span class="nt">&lt;goodsValue&gt;</span>50.00<span class="nt">&lt;/goodsValue&gt;</span>
+                    <span class="nt">&lt;/general&gt;</span>
+                    <span class="nt">&lt;origin&gt;</span>
+                        <span class="nt">&lt;description&gt;</span>ABC Suppliers<span class="nt">&lt;/description&gt;</span>
+                        <span class="nt">&lt;contactName&gt;</span>John Doe<span class="nt">&lt;/contactName&gt;</span>
+                        <span class="nt">&lt;companyName&gt;</span>ABC Suppliers<span class="nt">&lt;/companyName&gt;</span>
+                        <span class="nt">&lt;street&gt;</span>1 Originating Street<span class="nt">&lt;/street&gt;</span>
+                        <span class="nt">&lt;suburb&gt;</span>Brisbane<span class="nt">&lt;/suburb&gt;</span>
+                        <span class="nt">&lt;state&gt;</span>QLD<span class="nt">&lt;/state&gt;</span>
+                        <span class="nt">&lt;code&gt;</span>4000<span class="nt">&lt;/code&gt;</span>
+                        <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                        <span class="nt">&lt;phone1&gt;</span>(07) 3333 3333<span class="nt">&lt;/phone1&gt;</span>
+                        <span class="nt">&lt;phone2/&gt;</span>
+                        <span class="nt">&lt;fax&gt;</span>(07) 3333 3331<span class="nt">&lt;/fax&gt;</span>
+                        <span class="nt">&lt;email&gt;</span>bneoffice@abcsuppliers.com.au<span class="nt">&lt;/email&gt;</span>
+                    <span class="nt">&lt;/origin&gt;</span>
+                    <span class="nt">&lt;destination&gt;</span>
+                        <span class="nt">&lt;contactName&gt;</span>Jane Doe<span class="nt">&lt;/contactName&gt;</span>
+                        <span class="nt">&lt;street&gt;</span>2 Recipient Street<span class="nt">&lt;/street&gt;</span>
+                        <span class="nt">&lt;suburb&gt;</span>Sydney<span class="nt">&lt;/suburb&gt;</span>
+                        <span class="nt">&lt;state&gt;</span>NSW<span class="nt">&lt;/state&gt;</span>
+                        <span class="nt">&lt;code&gt;</span>2000<span class="nt">&lt;/code&gt;</span>
+                        <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                        <span class="nt">&lt;phone1&gt;</span>(02) 9333 3333<span class="nt">&lt;/phone1&gt;</span>
+                        <span class="nt">&lt;phone2/&gt;</span>
+                        <span class="nt">&lt;fax&gt;</span>(02) 9333 3331<span class="nt">&lt;/fax&gt;</span>
+                        <span class="nt">&lt;email&gt;</span>jane.doe@yahoo.com.au<span class="nt">&lt;/email&gt;</span>
+                    <span class="nt">&lt;/destination&gt;</span>
+                    <span class="nt">&lt;quotes&gt;</span>
+                        <span class="nt">&lt;quote&gt;</span>
+                            <span class="nt">&lt;generated&gt;</span>Automatically<span class="nt">&lt;/generated&gt;</span>
+                            <span class="nt">&lt;accepted&gt;</span>Y<span class="nt">&lt;/accepted&gt;</span>
+                            <span class="nt">&lt;bookingNumber&gt;</span>XYZ300001<span class="nt">&lt;/bookingNumber&gt;</span>
+                            <span class="nt">&lt;consignmentNumber&gt;</span>UVW400001<span class="nt">&lt;/consignmentNumber&gt;</span>
+                            <span class="nt">&lt;trackingStatus&gt;</span>In Transit<span class="nt">&lt;/trackingStatus&gt;</span>
+                            <span class="nt">&lt;trackingStatusOccurred&gt;</span>2009-07-02T15:25:46Z
+                            <span class="nt">&lt;/trackingStatusOccurred&gt;</span>
+                            <span class="nt">&lt;trackingLastChecked&gt;</span>2009-07-02T18:13:12Z<span class="nt">&lt;/trackingLastChecked&gt;</span>
+                            <span class="nt">&lt;trackingFurtherDetails/&gt;</span>
+                            <span class="nt">&lt;totalPrice&gt;</span>11.00<span class="nt">&lt;/totalPrice&gt;</span>
+                            <span class="nt">&lt;basePrice&gt;</span>10.00<span class="nt">&lt;/basePrice&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>1.00<span class="nt">&lt;/tax&gt;</span>
+                            <span class="nt">&lt;currency&gt;</span>AUD<span class="nt">&lt;/currency&gt;</span>
+                            <span class="nt">&lt;deliveryMethod&gt;</span>Off-peak<span class="nt">&lt;/deliveryMethod&gt;</span>
+                            <span class="nt">&lt;usingGeneralRail&gt;</span>N<span class="nt">&lt;/usingGeneralRail&gt;</span>
+                            <span class="nt">&lt;usingGeneralRoad&gt;</span>Y<span class="nt">&lt;/usingGeneralRoad&gt;</span>
+                            <span class="nt">&lt;usingGeneralSea&gt;</span>N<span class="nt">&lt;/usingGeneralSea&gt;</span>
+                            <span class="nt">&lt;usingExpressAir&gt;</span>N<span class="nt">&lt;/usingExpressAir&gt;</span>
+                            <span class="nt">&lt;usingExpressRoad&gt;</span>N<span class="nt">&lt;/usingExpressRoad&gt;</span>
+                            <span class="nt">&lt;etaFrom&gt;</span>2<span class="nt">&lt;/etaFrom&gt;</span>
+                            <span class="nt">&lt;etaTo&gt;</span>3<span class="nt">&lt;/etaTo&gt;</span>
+                            <span class="nt">&lt;guaranteedEta&gt;</span>Y<span class="nt">&lt;/guaranteedEta&gt;</span>
+                            <span class="nt">&lt;adjustments&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>0.20<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0.02<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>-0.20<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>-0.02<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                            <span class="nt">&lt;/adjustments&gt;</span>
+                            <span class="nt">&lt;inclusions&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Tracking available<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Tracking information will be available for this quote.
+                                    <span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Automatic Booking<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Automatic booking generated.<span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Automatic Consignment<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Automatic consignment note generated.<span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                            <span class="nt">&lt;/inclusions&gt;</span>
+                            <span class="nt">&lt;extras&gt;</span>
+                                <span class="nt">&lt;extra&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Insurance<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Insurance cover up to $5,000.<span class="nt">&lt;/details&gt;</span>
+                                    <span class="nt">&lt;totalPrice&gt;</span>2.20<span class="nt">&lt;/totalPrice&gt;</span>
+                                    <span class="nt">&lt;basePrice&gt;</span>2.00<span class="nt">&lt;/basePrice&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0.20<span class="nt">&lt;/tax&gt;</span>
+                                    <span class="nt">&lt;mandatory&gt;</span>Y<span class="nt">&lt;/mandatory&gt;</span>
+                                    <span class="nt">&lt;adjustments&gt;</span>
+                                        <span class="nt">&lt;adjustment&gt;</span>
+                                            <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                            <span class="nt">&lt;amount&gt;</span>0.04<span class="nt">&lt;/amount&gt;</span>
+                                            <span class="nt">&lt;tax&gt;</span>0.00<span class="nt">&lt;/tax&gt;</span>
+                                        <span class="nt">&lt;/adjustment&gt;</span>
+                                    <span class="nt">&lt;/adjustments&gt;</span>
+                                <span class="nt">&lt;/extra&gt;</span>
+                            <span class="nt">&lt;/extras&gt;</span>
+                            <span class="nt">&lt;carrier&gt;</span>
+                                <span class="nt">&lt;id&gt;</span>654321<span class="nt">&lt;/id&gt;</span>
+                                <span class="nt">&lt;companyName&gt;</span>ZYX Transport<span class="nt">&lt;/companyName&gt;</span>
+                                <span class="nt">&lt;companyContact&gt;</span>John Doe<span class="nt">&lt;/companyContact&gt;</span>
+                                <span class="nt">&lt;streetAddress&gt;</span>1 Transport Street<span class="nt">&lt;/streetAddress&gt;</span>
+                                <span class="nt">&lt;streetSuburb&gt;</span>Brisbane<span class="nt">&lt;/streetSuburb&gt;</span>
+                                <span class="nt">&lt;streetCity&gt;</span>Brisbane<span class="nt">&lt;/streetCity&gt;</span>
+                                <span class="nt">&lt;streetState&gt;</span>QLD<span class="nt">&lt;/streetState&gt;</span>
+                                <span class="nt">&lt;streetCode&gt;</span>4000<span class="nt">&lt;/streetCode&gt;</span>
+                                <span class="nt">&lt;streetCountry&gt;</span>AU<span class="nt">&lt;/streetCountry&gt;</span>
+                                <span class="nt">&lt;postalAddress&gt;</span>PO Box 1111<span class="nt">&lt;/postalAddress&gt;</span>
+                                <span class="nt">&lt;postalSuburb&gt;</span>Brisbane<span class="nt">&lt;/postalSuburb&gt;</span>
+                                <span class="nt">&lt;postalCity&gt;</span>Brisbane<span class="nt">&lt;/postalCity&gt;</span>
+                                <span class="nt">&lt;postalState&gt;</span>QLD<span class="nt">&lt;/postalState&gt;</span>
+                                <span class="nt">&lt;postalCode&gt;</span>4001<span class="nt">&lt;/postalCode&gt;</span>
+                                <span class="nt">&lt;postalCountry&gt;</span>AU<span class="nt">&lt;/postalCountry&gt;</span>
+                                <span class="nt">&lt;phone1&gt;</span>(07) 3333 3333<span class="nt">&lt;/phone1&gt;</span>
+                                <span class="nt">&lt;email&gt;</span>john.doe@zyxtransport.com.au<span class="nt">&lt;/email&gt;</span>
+                                <span class="nt">&lt;website&gt;</span>https://www.zyxtransport.com.au<span class="nt">&lt;/website&gt;</span>
+                                <span class="nt">&lt;conditions&gt;</span>Our conditions include: lots of text.<span class="nt">&lt;/conditions&gt;</span>
+                            <span class="nt">&lt;/carrier&gt;</span>
+                        <span class="nt">&lt;/quote&gt;</span>
+                    <span class="nt">&lt;/quotes&gt;</span>
+                    <span class="nt">&lt;instructions&gt;</span>Please use side door.<span class="nt">&lt;/instructions&gt;</span>
+                    <span class="nt">&lt;reference&gt;</span>ABC200000<span class="nt">&lt;/reference&gt;</span>
+                    <span class="nt">&lt;comments&gt;</span>Please don't use any chains on the axle.<span class="nt">&lt;/comments&gt;</span>
+                <span class="nt">&lt;/request&gt;</span>
+            <span class="nt">&lt;/requests&gt;</span>
+            <span class="nt">&lt;consignmentDocument&gt;</span>JVBER … shortened for readability … XRhbG<span class="nt">&lt;/consignmentDocument&gt;</span>
+            <span class="nt">&lt;consignmentDocumentType&gt;</span>application/pdf<span class="nt">&lt;/consignmentDocumentType&gt;</span>
+            <span class="nt">&lt;labelDocument&gt;</span>e3Rf3 … shortened for readability … X8ggy<span class="nt">&lt;/labelDocument&gt;</span>
+            <span class="nt">&lt;labelDocumentType&gt;</span>application/pdf<span class="nt">&lt;/labelDocumentType&gt;</span>
+        <span class="nt">&lt;/ns1:getManifestResponse&gt;</span>
+    <span class="nt">&lt;/soap-env:Body&gt;</span>
+<span class="nt">&lt;/soap-env:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<p>The details relating to the associated requests, manifest documents and label documents.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>requests</td>
+<td>list</td>
+<td>Optional</td>
+<td>A list of corresponding requests.</td>
+</tr>
+<tr>
+<td>manifestDocument</td>
+<td>simple</td>
+<td>Always</td>
+<td>The manifest document. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64.</td>
+</tr>
+<tr>
+<td>manifestDocumentType</td>
+<td>simple</td>
+<td>Always</td>
+<td>The type of the manifest document.</td>
+</tr>
+<tr>
+<td>labelDocument</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The label document. This will only be provided if a value was provided for the labelPrinterType element. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64.</td>
+</tr>
+<tr>
+<td>labelDocumentType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of the label document. This will only be provided if a value was provided for the labelPrinterType element.</td>
+</tr>
+</tbody></table>
+
+<h1 id='a-idconfirmmanifestconfirmmanifesta'><a id="confirmManifest">confirmManifest</a></h1>
+
+<p>The confirmManifest operation registers those requests that match the supplied parameters as being confirmed and ready to send.  If a confirmedReadyDate is supplied all matching requests are updated to have this new send date.</p>
+
+<p>The response message is a confirmManifestResponse, and contains the manifest documents (and label documents, if requested).</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idconfirmmanifest-requestarequest'><a id="confirmManifest-Request"></a>Request</h2>
+
+<blockquote>
+<p>confirmManifest request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"confirmManifest"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"carrierId"</span> <span class="na">type=</span><span class="s">"com:CarrierId"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"clientId"</span> <span class="na">type=</span><span class="s">"com:ClientId"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"location"</span> <span class="na">type=</span><span class="s">"com:Location"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"startReadyDate"</span> <span class="na">type=</span><span class="s">"com:Date"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"endReadyDate"</span> <span class="na">type=</span><span class="s">"com:Date"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"confirmedReadyDate"</span> <span class="na">type=</span><span class="s">"com:Date"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"listRequests"</span> <span class="na">type=</span><span class="s">"com:YesNoOption"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelPrinterType"</span> <span class="na">type=</span><span class="s">"com:LabelPrinterType"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample confirmManifest request</p>
+</blockquote>
+
+<pre class="highlight html">Confirm all bookings being sent from the location ABC Suppliers, between (and included) the dates 1st July, 2009 and 3rd July, 2009.  Also update the send date for all bookings to the 1st July, 2009.
+</pre>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soapenv:Envelope</span>
+        <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;wsse:Security</span> <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+                <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+                <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+            <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+        <span class="nt">&lt;/wsse:Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;tem:confirmManifest</span>
+          <span class="na">xmlns:tem=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;location&gt;</span>ABC Suppliers<span class="nt">&lt;/location&gt;</span>
+            <span class="nt">&lt;startReadyDate&gt;</span>2009-07-01<span class="nt">&lt;/startReadyDate&gt;</span>
+            <span class="nt">&lt;endReadyDate&gt;</span>2009-07-03<span class="nt">&lt;/endReadyDate&gt;</span>
+            <span class="nt">&lt;confirmedReadyDate&gt;</span>2009-07-01<span class="nt">&lt;/confirmedReadyDate&gt;</span>
+            <span class="nt">&lt;labelPrinterType&gt;</span>Thermal<span class="nt">&lt;/labelPrinterType&gt;</span>
+        <span class="nt">&lt;/tem:confirmManifest&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>carrierId</td>
+<td>simple</td>
+<td>Required</td>
+<td>The carrier&rsquo;s id for confirming only those bookings associated with this carrier.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The client&rsquo;s id for confirming only those bookings associated with this client.</td>
+</tr>
+<tr>
+<td>location</td>
+<td>simple</td>
+<td>Required</td>
+<td>The location description for confirming only those bookings associated with this location.</td>
+</tr>
+<tr>
+<td>startReadyDate</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The start ready date for confirming only those bookings with a ready date after (and including) this supplied date.</td>
+</tr>
+<tr>
+<td>endReadyDate</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The end ready date for confirming only those bookings with a ready date before (and including) this supplied date.</td>
+</tr>
+<tr>
+<td>confirmedReadyDate</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The ready date that all matching bookings will be updated to.</td>
+</tr>
+<tr>
+<td>listRequests</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Whether to return a list of request entries as data values.</td>
+</tr>
+<tr>
+<td>labelPrinterType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of printer that will be used for printing the item label/s.  If no label/s required this element should not be supplied.</td>
+</tr>
+</tbody></table>
+
+<p><aside class="notice">
+* Although the Occurs is specified in the XML definition, further restrictions are applied to this field. Detailed in Further Restrictions section below.
+</aside></p>
+
+<h3 id='further-restrictions'>Further Restrictions:</h3>
+
+<p>Further to the restrictions applied by the field&rsquo;s base type and element conditions (eg. minOccurs=&ldquo;0&rdquo;) the following rules will also be applied after the data has passed the XML tests:</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Further restrictions</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clientId</td>
+<td>Only applies and Mandatory for users with API (Affiliate): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idconfirmmanifest-responsearesponse'><a id="confirmManifest-Response"></a>Response</h2>
+
+<blockquote>
+<p>confirmManifest response schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"confirmManifestResponse"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"requests"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xsd:complexType&gt;</span>
+                    <span class="nt">&lt;xsd:sequence&gt;</span>
+                        <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"request"</span> <span class="na">type=</span><span class="s">"com:Request"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+                    <span class="nt">&lt;/xsd:sequence&gt;</span>
+                <span class="nt">&lt;/xsd:complexType&gt;</span>
+            <span class="nt">&lt;/xsd:element&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"manifestDocument"</span> <span class="na">type=</span><span class="s">"com:ManifestDocument"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"manifestDocumentType"</span>
+           <span class="na">type=</span><span class="s">"com:ManifestDocumentType"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocument"</span> <span class="na">type=</span><span class="s">"com:LabelDocument"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelDocumentType"</span> <span class="na">type=</span><span class="s">"com:LabelDocumentType"</span>
+           <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample confirmManifest response</p>
+</blockquote>
+
+<pre class="highlight html">Requests, manfiest and labels for all bookings being sent from the location ABC Suppliers, on the 1st July, 2009.
+</pre>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soap-env:Envelope</span>
+        <span class="na">xmlns:soap-env=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soap-env:Header/&gt;</span>
+    <span class="nt">&lt;soap-env:Body&gt;</span>
+        <span class="nt">&lt;ns1:confirmManifestResponse</span>
+          <span class="na">xmlns:ns1=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;requests&gt;</span>
+                <span class="nt">&lt;request</span> <span class="na">id=</span><span class="s">"100000"</span><span class="nt">&gt;</span>
+                    <span class="nt">&lt;status&gt;</span>Completed<span class="nt">&lt;/status&gt;</span>
+                    <span class="nt">&lt;anythings&gt;</span>
+                        <span class="nt">&lt;anything&gt;</span>
+                            <span class="nt">&lt;class&gt;</span>Freight<span class="nt">&lt;/class&gt;</span>
+                            <span class="nt">&lt;mode&gt;</span>Less than load<span class="nt">&lt;/mode&gt;</span>
+                            <span class="nt">&lt;packaging&gt;</span>Carton<span class="nt">&lt;/packaging&gt;</span>
+                            <span class="nt">&lt;qualifierFreightGeneralFragile&gt;</span>N<span class="nt">&lt;/qualifierFreightGeneralFragile&gt;</span>
+                            <span class="nt">&lt;distanceMeasurementType&gt;</span>Centimetres<span class="nt">&lt;/distanceMeasurementType&gt;</span>
+                            <span class="nt">&lt;weightMeasurementType&gt;</span>Kilograms<span class="nt">&lt;/weightMeasurementType&gt;</span>
+                            <span class="nt">&lt;length&gt;</span>10<span class="nt">&lt;/length&gt;</span>
+                            <span class="nt">&lt;width&gt;</span>10<span class="nt">&lt;/width&gt;</span>
+                            <span class="nt">&lt;height&gt;</span>10<span class="nt">&lt;/height&gt;</span>
+                            <span class="nt">&lt;weight&gt;</span>1<span class="nt">&lt;/weight&gt;</span>
+                            <span class="nt">&lt;quantity&gt;</span>2<span class="nt">&lt;/quantity&gt;</span>
+                            <span class="nt">&lt;description&gt;</span>Contains hats.<span class="nt">&lt;/description&gt;</span>
+                        <span class="nt">&lt;/anything&gt;</span>
+                    <span class="nt">&lt;/anythings&gt;</span>
+                    <span class="nt">&lt;anywhere&gt;</span>
+                        <span class="nt">&lt;itemNature&gt;</span>Domestic<span class="nt">&lt;/itemNature&gt;</span>
+                        <span class="nt">&lt;itemMethod&gt;</span>Door to Door<span class="nt">&lt;/itemMethod&gt;</span>
+                        <span class="nt">&lt;originCountry&gt;</span>AU<span class="nt">&lt;/originCountry&gt;</span>
+                        <span class="nt">&lt;originCode&gt;</span>4000<span class="nt">&lt;/originCode&gt;</span>
+                        <span class="nt">&lt;originSuburb&gt;</span>Brisbane<span class="nt">&lt;/originSuburb&gt;</span>
+                        <span class="nt">&lt;destinationCountry&gt;</span>AU<span class="nt">&lt;/destinationCountry&gt;</span>
+                        <span class="nt">&lt;destinationCode&gt;</span>2000<span class="nt">&lt;/destinationCode&gt;</span>
+                        <span class="nt">&lt;destinationSuburb&gt;</span>Sydney<span class="nt">&lt;/destinationSuburb&gt;</span>
+                        <span class="nt">&lt;destinationIs&gt;</span>Residence<span class="nt">&lt;/destinationIs&gt;</span>
+                        <span class="nt">&lt;destinationResPostalBox&gt;</span>N<span class="nt">&lt;/destinationResPostalBox&gt;</span>
+                        <span class="nt">&lt;destinationResUnattended&gt;</span>N<span class="nt">&lt;/destinationResUnattended&gt;</span>
+                        <span class="nt">&lt;destinationResInside&gt;</span>N<span class="nt">&lt;/destinationResInside&gt;</span>
+                        <span class="nt">&lt;destinationResLimitedAccess&gt;</span>N<span class="nt">&lt;/destinationResLimitedAccess&gt;</span>
+                        <span class="nt">&lt;destinationResHeavyLift&gt;</span>N<span class="nt">&lt;/destinationResHeavyLift&gt;</span>
+                        <span class="nt">&lt;originIs&gt;</span>Business<span class="nt">&lt;/originIs&gt;</span>
+                        <span class="nt">&lt;originBusUnattended&gt;</span>N<span class="nt">&lt;/originBusUnattended&gt;</span>
+                        <span class="nt">&lt;originBusDock&gt;</span>Y<span class="nt">&lt;/originBusDock&gt;</span>
+                        <span class="nt">&lt;originBusForklift&gt;</span>N<span class="nt">&lt;/originBusForklift&gt;</span>
+                        <span class="nt">&lt;originBusLoadingFacilities&gt;</span>N<span class="nt">&lt;/originBusLoadingFacilities&gt;</span>
+                        <span class="nt">&lt;originBusInside&gt;</span>N<span class="nt">&lt;/originBusInside&gt;</span>
+                        <span class="nt">&lt;originBusLimitedAccess&gt;</span>N<span class="nt">&lt;/originBusLimitedAccess&gt;</span>
+                        <span class="nt">&lt;originBusHeavyLift&gt;</span>N<span class="nt">&lt;/originBusHeavyLift&gt;</span>
+                        <span class="nt">&lt;originBusTailgateLifter&gt;</span>N<span class="nt">&lt;/originBusTailgateLifter&gt;</span>
+                        <span class="nt">&lt;originBusContainerSwingLifter&gt;</span>N<span class="nt">&lt;/originBusContainerSwingLifter&gt;</span>
+                    <span class="nt">&lt;/anywhere&gt;</span>
+                    <span class="nt">&lt;anytime&gt;</span>
+                        <span class="nt">&lt;readyDate&gt;</span>2009-07-01<span class="nt">&lt;/readyDate&gt;</span>
+                        <span class="nt">&lt;readyTime&gt;</span>PM<span class="nt">&lt;/readyTime&gt;</span>
+                    <span class="nt">&lt;/anytime&gt;</span>
+                    <span class="nt">&lt;general&gt;</span>
+                        <span class="nt">&lt;goodsValue&gt;</span>50.00<span class="nt">&lt;/goodsValue&gt;</span>
+                    <span class="nt">&lt;/general&gt;</span>
+                    <span class="nt">&lt;origin&gt;</span>
+                        <span class="nt">&lt;description&gt;</span>ABC Suppliers<span class="nt">&lt;/description&gt;</span>
+                        <span class="nt">&lt;contactName&gt;</span>John Doe<span class="nt">&lt;/contactName&gt;</span>
+                        <span class="nt">&lt;companyName&gt;</span>ABC Suppliers<span class="nt">&lt;/companyName&gt;</span>
+                        <span class="nt">&lt;street&gt;</span>1 Originating Street<span class="nt">&lt;/street&gt;</span>
+                        <span class="nt">&lt;suburb&gt;</span>Brisbane<span class="nt">&lt;/suburb&gt;</span>
+                        <span class="nt">&lt;state&gt;</span>QLD<span class="nt">&lt;/state&gt;</span>
+                        <span class="nt">&lt;code&gt;</span>4000<span class="nt">&lt;/code&gt;</span>
+                        <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                        <span class="nt">&lt;phone1&gt;</span>(07) 3333 3333<span class="nt">&lt;/phone1&gt;</span>
+                        <span class="nt">&lt;phone2/&gt;</span>
+                        <span class="nt">&lt;fax&gt;</span>(07) 3333 3331<span class="nt">&lt;/fax&gt;</span>
+                        <span class="nt">&lt;email&gt;</span>bneoffice@abcsuppliers.com.au<span class="nt">&lt;/email&gt;</span>
+                    <span class="nt">&lt;/origin&gt;</span>
+                    <span class="nt">&lt;destination&gt;</span>
+                        <span class="nt">&lt;contactName&gt;</span>Jane Doe<span class="nt">&lt;/contactName&gt;</span>
+                        <span class="nt">&lt;street&gt;</span>2 Recipient Street<span class="nt">&lt;/street&gt;</span>
+                        <span class="nt">&lt;suburb&gt;</span>Sydney<span class="nt">&lt;/suburb&gt;</span>
+                        <span class="nt">&lt;state&gt;</span>NSW<span class="nt">&lt;/state&gt;</span>
+                        <span class="nt">&lt;code&gt;</span>2000<span class="nt">&lt;/code&gt;</span>
+                        <span class="nt">&lt;country&gt;</span>AU<span class="nt">&lt;/country&gt;</span>
+                        <span class="nt">&lt;phone1&gt;</span>(02) 9333 3333<span class="nt">&lt;/phone1&gt;</span>
+                        <span class="nt">&lt;phone2/&gt;</span>
+                        <span class="nt">&lt;fax&gt;</span>(02) 9333 3331<span class="nt">&lt;/fax&gt;</span>
+                        <span class="nt">&lt;email&gt;</span>jane.doe@yahoo.com.au<span class="nt">&lt;/email&gt;</span>
+                    <span class="nt">&lt;/destination&gt;</span>
+                    <span class="nt">&lt;quotes&gt;</span>
+                        <span class="nt">&lt;quote&gt;</span>
+                            <span class="nt">&lt;generated&gt;</span>Automatically<span class="nt">&lt;/generated&gt;</span>
+                            <span class="nt">&lt;accepted&gt;</span>Y<span class="nt">&lt;/accepted&gt;</span>
+                            <span class="nt">&lt;bookingNumber&gt;</span>XYZ300001<span class="nt">&lt;/bookingNumber&gt;</span>
+                            <span class="nt">&lt;consignmentNumber&gt;</span>UVW400001<span class="nt">&lt;/consignmentNumber&gt;</span>
+                            <span class="nt">&lt;trackingStatus&gt;</span>In Transit<span class="nt">&lt;/trackingStatus&gt;</span>
+                            <span class="nt">&lt;trackingStatusOccurred&gt;</span>2009-07-02T15:25:46Z
+                            <span class="nt">&lt;/trackingStatusOccurred&gt;</span>
+                            <span class="nt">&lt;trackingLastChecked&gt;</span>2009-07-02T18:13:12Z<span class="nt">&lt;/trackingLastChecked&gt;</span>
+                            <span class="nt">&lt;trackingFurtherDetails/&gt;</span>
+                            <span class="nt">&lt;totalPrice&gt;</span>11.00<span class="nt">&lt;/totalPrice&gt;</span>
+                            <span class="nt">&lt;basePrice&gt;</span>10.00<span class="nt">&lt;/basePrice&gt;</span>
+                            <span class="nt">&lt;tax&gt;</span>1.00<span class="nt">&lt;/tax&gt;</span>
+                            <span class="nt">&lt;currency&gt;</span>AUD<span class="nt">&lt;/currency&gt;</span>
+                            <span class="nt">&lt;deliveryMethod&gt;</span>Off-peak<span class="nt">&lt;/deliveryMethod&gt;</span>
+                            <span class="nt">&lt;usingGeneralRail&gt;</span>N<span class="nt">&lt;/usingGeneralRail&gt;</span>
+                            <span class="nt">&lt;usingGeneralRoad&gt;</span>Y<span class="nt">&lt;/usingGeneralRoad&gt;</span>
+                            <span class="nt">&lt;usingGeneralSea&gt;</span>N<span class="nt">&lt;/usingGeneralSea&gt;</span>
+                            <span class="nt">&lt;usingExpressAir&gt;</span>N<span class="nt">&lt;/usingExpressAir&gt;</span>
+                            <span class="nt">&lt;usingExpressRoad&gt;</span>N<span class="nt">&lt;/usingExpressRoad&gt;</span>
+                            <span class="nt">&lt;etaFrom&gt;</span>2<span class="nt">&lt;/etaFrom&gt;</span>
+                            <span class="nt">&lt;etaTo&gt;</span>3<span class="nt">&lt;/etaTo&gt;</span>
+                            <span class="nt">&lt;guaranteedEta&gt;</span>Y<span class="nt">&lt;/guaranteedEta&gt;</span>
+                            <span class="nt">&lt;adjustments&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>0.20<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0.02<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                                <span class="nt">&lt;adjustment&gt;</span>
+                                    <span class="nt">&lt;description&gt;</span>Credit Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                    <span class="nt">&lt;amount&gt;</span>-0.20<span class="nt">&lt;/amount&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>-0.02<span class="nt">&lt;/tax&gt;</span>
+                                <span class="nt">&lt;/adjustment&gt;</span>
+                            <span class="nt">&lt;/adjustments&gt;</span>
+                            <span class="nt">&lt;inclusions&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Tracking available<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Tracking information will be available for this quote.
+                                    <span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Automatic Booking<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Automatic booking generated.<span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                                <span class="nt">&lt;inclusion&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Automatic Consignment<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Automatic consignment note generated.<span class="nt">&lt;/details&gt;</span>
+                                <span class="nt">&lt;/inclusion&gt;</span>
+                            <span class="nt">&lt;/inclusions&gt;</span>
+                            <span class="nt">&lt;extras&gt;</span>
+                                <span class="nt">&lt;extra&gt;</span>
+                                    <span class="nt">&lt;summary&gt;</span>Insurance<span class="nt">&lt;/summary&gt;</span>
+                                    <span class="nt">&lt;details&gt;</span>Insurance cover up to $5,000.<span class="nt">&lt;/details&gt;</span>
+                                    <span class="nt">&lt;totalPrice&gt;</span>2.20<span class="nt">&lt;/totalPrice&gt;</span>
+                                    <span class="nt">&lt;basePrice&gt;</span>2.00<span class="nt">&lt;/basePrice&gt;</span>
+                                    <span class="nt">&lt;tax&gt;</span>0.20<span class="nt">&lt;/tax&gt;</span>
+                                    <span class="nt">&lt;mandatory&gt;</span>Y<span class="nt">&lt;/mandatory&gt;</span>
+                                    <span class="nt">&lt;adjustments&gt;</span>
+                                        <span class="nt">&lt;adjustment&gt;</span>
+                                            <span class="nt">&lt;description&gt;</span>Credit Card Payment Adjustment<span class="nt">&lt;/description&gt;</span>
+                                            <span class="nt">&lt;amount&gt;</span>0.04<span class="nt">&lt;/amount&gt;</span>
+                                            <span class="nt">&lt;tax&gt;</span>0.00<span class="nt">&lt;/tax&gt;</span>
+                                        <span class="nt">&lt;/adjustment&gt;</span>
+                                    <span class="nt">&lt;/adjustments&gt;</span>
+                                <span class="nt">&lt;/extra&gt;</span>
+                            <span class="nt">&lt;/extras&gt;</span>
+                            <span class="nt">&lt;carrier&gt;</span>
+                                <span class="nt">&lt;id&gt;</span>654321<span class="nt">&lt;/id&gt;</span>
+                                <span class="nt">&lt;companyName&gt;</span>ZYX Transport<span class="nt">&lt;/companyName&gt;</span>
+                                <span class="nt">&lt;companyContact&gt;</span>John Doe<span class="nt">&lt;/companyContact&gt;</span>
+                                <span class="nt">&lt;streetAddress&gt;</span>1 Transport Street<span class="nt">&lt;/streetAddress&gt;</span>
+                                <span class="nt">&lt;streetSuburb&gt;</span>Brisbane<span class="nt">&lt;/streetSuburb&gt;</span>
+                                <span class="nt">&lt;streetCity&gt;</span>Brisbane<span class="nt">&lt;/streetCity&gt;</span>
+                                <span class="nt">&lt;streetState&gt;</span>QLD<span class="nt">&lt;/streetState&gt;</span>
+                                <span class="nt">&lt;streetCode&gt;</span>4000<span class="nt">&lt;/streetCode&gt;</span>
+                                <span class="nt">&lt;streetCountry&gt;</span>AU<span class="nt">&lt;/streetCountry&gt;</span>
+                                <span class="nt">&lt;postalAddress&gt;</span>PO Box 1111<span class="nt">&lt;/postalAddress&gt;</span>
+                                <span class="nt">&lt;postalSuburb&gt;</span>Brisbane<span class="nt">&lt;/postalSuburb&gt;</span>
+                                <span class="nt">&lt;postalCity&gt;</span>Brisbane<span class="nt">&lt;/postalCity&gt;</span>
+                                <span class="nt">&lt;postalState&gt;</span>QLD<span class="nt">&lt;/postalState&gt;</span>
+                                <span class="nt">&lt;postalCode&gt;</span>4001<span class="nt">&lt;/postalCode&gt;</span>
+                                <span class="nt">&lt;postalCountry&gt;</span>AU<span class="nt">&lt;/postalCountry&gt;</span>
+                                <span class="nt">&lt;phone1&gt;</span>(07) 3333 3333<span class="nt">&lt;/phone1&gt;</span>
+                                <span class="nt">&lt;email&gt;</span>john.doe@zyxtransport.com.au<span class="nt">&lt;/email&gt;</span>
+                                <span class="nt">&lt;website&gt;</span>https://www.zyxtransport.com.au<span class="nt">&lt;/website&gt;</span>
+                                <span class="nt">&lt;conditions&gt;</span>Our conditions include: lots of text.<span class="nt">&lt;/conditions&gt;</span>
+                            <span class="nt">&lt;/carrier&gt;</span>
+                        <span class="nt">&lt;/quote&gt;</span>
+                    <span class="nt">&lt;/quotes&gt;</span>
+                    <span class="nt">&lt;instructions&gt;</span>Please use side door.<span class="nt">&lt;/instructions&gt;</span>
+                    <span class="nt">&lt;reference&gt;</span>ABC200000<span class="nt">&lt;/reference&gt;</span>
+                    <span class="nt">&lt;comments&gt;</span>Please don't use any chains on the axle.<span class="nt">&lt;/comments&gt;</span>
+                <span class="nt">&lt;/request&gt;</span>
+            <span class="nt">&lt;/requests&gt;</span>
+            <span class="nt">&lt;consignmentDocument&gt;</span>JVBER … shortened for readability … XRhbG<span class="nt">&lt;/consignmentDocument&gt;</span>
+            <span class="nt">&lt;consignmentDocumentType&gt;</span>application/pdf<span class="nt">&lt;/consignmentDocumentType&gt;</span>
+            <span class="nt">&lt;labelDocument&gt;</span>e3Rf3 … shortened for readability … X8ggy<span class="nt">&lt;/labelDocument&gt;</span>
+            <span class="nt">&lt;labelDocumentType&gt;</span>application/pdf<span class="nt">&lt;/labelDocumentType&gt;</span>
+        <span class="nt">&lt;/ns1:confirmManifestResponse&gt;</span>
+    <span class="nt">&lt;/soap-env:Body&gt;</span>
+<span class="nt">&lt;/soap-env:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<p>The details relating to the associated requests, manifest documents and label documents.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>requests</td>
+<td>list</td>
+<td>Optional</td>
+<td>A list of corresponding requests.</td>
+</tr>
+<tr>
+<td>manifestDocument</td>
+<td>simple</td>
+<td>Always</td>
+<td>The manifest document. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64.</td>
+</tr>
+<tr>
+<td>manifestDocumentType</td>
+<td>simple</td>
+<td>Always</td>
+<td>The type of the manifest document.</td>
+</tr>
+<tr>
+<td>labelDocument</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The label document. This will only be provided if a value was provided for the labelPrinterType element. Important: The contents of this field are encoded using base64. This is done to ensure that the binary data that forms the file&rsquo;s contents survive transport through the transport layer. When creating a file from this field&rsquo;s contents you will need to ensure that you decode using base64.</td>
+</tr>
+<tr>
+<td>labelDocumentType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of the label document. This will only be provided if a value was provided for the labelPrinterType element.</td>
+</tr>
+</tbody></table>
+
+<h1 id='a-idgetrequestgetrequesta'><a id="getRequest">getRequest</a></h1>
+
+<p>The getRequest operation retrieves a request and associated details based on the supplied request id.</p>
+
+<p>The response message is a getRequestResponse, and contains all information relating to a request.</p>
+
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+
+<h2 id='a-idgetrequest-requestarequest'><a id="getRequest-Request"></a>Request</h2>
+
+<blockquote>
+<p>getRequest request schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getRequest"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"requestId"</span> <span class="na">type=</span><span class="s">"xsd:positiveInteger"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"bookingNumber"</span> <span class="na">type=</span><span class="s">"com:BookingNumber"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"reference"</span> <span class="na">type=</span><span class="s">"com:ClientReference"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"detail"</span> <span class="na">type=</span><span class="s">"com:Detail"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"labelPrinterType"</span> <span class="na">type=</span><span class="s">"com:LabelPrinterType"</span> <span class="na">minOccurs=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>    
+</pre>
+
+<blockquote>
+<p>Sample getRequest request</p>
+</blockquote>
+
+<pre class="highlight html">Retrieve request details for the request with the id of “100000”.
+</pre>
+
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;soapenv:Envelope</span>
+        <span class="na">xmlns:soapenv=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span>
+        <span class="na">xmlns:xsd=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span>
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;soapenv:Header&gt;</span>
+        <span class="nt">&lt;wsse:Security</span>
+          <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;wsse:UsernameToken&gt;</span>
+                <span class="nt">&lt;wsse:Username&gt;</span>username<span class="nt">&lt;/wsse:Username&gt;</span>
+                <span class="nt">&lt;wsse:Password&gt;</span>password<span class="nt">&lt;/wsse:Password&gt;</span>
+            <span class="nt">&lt;/wsse:UsernameToken&gt;</span>
+        <span class="nt">&lt;/wsse:Security&gt;</span>
+    <span class="nt">&lt;/soapenv:Header&gt;</span>
+    <span class="nt">&lt;soapenv:Body&gt;</span>
+        <span class="nt">&lt;tem:getRequest</span>
+          <span class="na">xmlns:tem=</span><span class="s">"http://api.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;requestId&gt;</span>100000<span class="nt">&lt;/requestId&gt;</span>
+            <span class="nt">&lt;detail&gt;</span>Detailed<span class="nt">&lt;/detail&gt;</span>
+            <span class="nt">&lt;labelPrinterType&gt;</span>Thermal<span class="nt">&lt;/labelPrinterType&gt;</span>
+        <span class="nt">&lt;/tem:getRequest&gt;</span>
+    <span class="nt">&lt;/soapenv:Body&gt;</span>
+<span class="nt">&lt;/soapenv:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>requestId</td>
+<td>positiveInteger</td>
+<td>Optional*</td>
+<td>The request id of the request required.</td>
+</tr>
+<tr>
+<td>bookingNumber</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>The carrier&rsquo;s booking number for the request.</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>simple</td>
+<td>Optional*</td>
+<td>Client reference relating to the request.</td>
+</tr>
+<tr>
+<td>detail</td>
+<td>simple</td>
+<td>Optional</td>
+<td>Specifies the amount of detail required in the returned response.  If value is: Summary: the consignment and label documents will not be returned. Detailed: all elements returned. If no value supplied will default to &ldquo;Summary&rdquo;.</td>
+</tr>
+<tr>
+<td>labelPrinterType</td>
+<td>simple</td>
+<td>Optional</td>
+<td>The type of printer that will be used for printing the item label/s.  If no label/s required this element should not be supplied. Will only be used if supplied detail value is Detailed.</td>
+</tr>
+</tbody></table>
+
+<p><aside class="notice">
+* Although the Occurs is specified in the XML definition, further restrictions are applied to this field. Detailed in Further Restrictions section below.
+</aside></p>
+
+<h3 id='further-restrictions'>Further Restrictions:</h3>
+
+<p>Further to the restrictions applied by the field&rsquo;s base type and element conditions (eg. minOccurs=&ldquo;0&rdquo;) the following rules will also be applied after the data has passed the XML tests:</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Further restrictions</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>requestId</td>
+<td>Mandatory if a reference is not supplied and user has API (Client): General and API (Affiliate): General access rights.</td>
+</tr>
+<tr>
+<td></td>
+<td>Mandatory if a bookingNumber is not supplied and user has API (Carrier): General access rights.</td>
+</tr>
+<tr>
+<td>bookingNumber</td>
+<td>Only applies for users with API (Carrier): General access rights. Any supplied values are disregarded in all other cases.</td>
+</tr>
+<tr>
+<td></td>
+<td>Mandatory if a requestId is not supplied and user has API (Carrier): General access rights.</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>Mandatory if a requestId is not supplied and user has API (Client): General and API (Affiliate): General access rights.</td>
+</tr>
+</tbody></table>
+
+<h2 id='a-idgetrequest-responsearesponse'><a id="getRequest-Response"></a>Response</h2>
+
+<blockquote>
+<p>getRequest response schema</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"getRequestResponse"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xsd:complexType&gt;</span>
+        <span class="nt">&lt;xsd:all&gt;</span>
+            <span class="nt">&lt;xsd:element</span> <span class="na">name=</span><span class="s">"request"</span> <span class="na">type=</span><span class="s">"com:Request"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xsd:all&gt;</span>
+    <span class="nt">&lt;/xsd:complexType&gt;</span>
+<span class="nt">&lt;/xsd:element&gt;</span>
+</pre>
+
+<blockquote>
+<p>Sample getRequest response</p>
+</blockquote>
+
+<pre class="highlight xml"><span class="nt">&lt;SOAP-ENV:Envelope</span> <span class="na">xmlns:SOAP-ENV=</span><span class="s">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="na">xmlns:ns1=</span><span class="s">"http://api-demo.temando.com/schema/2009_06/server.xsd"</span><span class="nt">&gt;</span>
+   <span class="nt">&lt;SOAP-ENV:Body&gt;</span>
+      <span class="nt">&lt;ns1:getRequestResponse&gt;</span>
+         <span class="nt">&lt;request</span> <span class="na">id=</span><span class="s">"10007736"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;status&gt;</span>Awaiting Booking<span class="nt">&lt;/status&gt;</span>
+            <span class="nt">&lt;quotes&gt;</span>
+               <span class="nt">&lt;quote&gt;</span>
+                  <span class="nt">&lt;consignmentNumber&gt;</span>TXN005077970<span class="nt">&lt;/consignmentNumber&gt;</span>
+                  <span class="nt">&lt;manifestNumber&gt;</span>00070925<span class="nt">&lt;/manifestNumber&gt;</span>
+                  <span class="nt">&lt;articles&gt;</span>
+                     <span class="nt">&lt;article&gt;</span>
+                        <span class="nt">&lt;anythingIndex&gt;</span>1<span class="nt">&lt;/anythingIndex&gt;</span>
+                        <span class="nt">&lt;articleNumber&gt;</span>11293323005077970001<span class="nt">&lt;/articleNumber&gt;</span>
+                     <span class="nt">&lt;/article&gt;</span>
+                  <span class="nt">&lt;/articles&gt;</span>
+                  <span class="nt">&lt;carrier&gt;</span>
+                     <span class="nt">&lt;id&gt;</span>60027<span class="nt">&lt;/id&gt;</span>
+                     <span class="nt">&lt;companyName&gt;</span>TNT - Auth To Leave<span class="nt">&lt;/companyName&gt;</span>
+                     <span class="nt">&lt;companyContact&gt;</span>Stewart Seddon<span class="nt">&lt;/companyContact&gt;</span>
+                     <span class="nt">&lt;streetAddress&gt;</span>127 Riawena Road<span class="nt">&lt;/streetAddress&gt;</span>
+                     <span class="nt">&lt;streetSuburb&gt;</span>Salisbury<span class="nt">&lt;/streetSuburb&gt;</span>
+                     <span class="nt">&lt;streetCity&gt;</span>Brisbane<span class="nt">&lt;/streetCity&gt;</span>
+                     <span class="nt">&lt;streetState&gt;</span>QLD<span class="nt">&lt;/streetState&gt;</span>
+                     <span class="nt">&lt;streetCode&gt;</span>4107<span class="nt">&lt;/streetCode&gt;</span>
+                     <span class="nt">&lt;streetCountry&gt;</span>AU<span class="nt">&lt;/streetCountry&gt;</span>
+                     <span class="nt">&lt;postalAddress&gt;</span>127 Riawena Road<span class="nt">&lt;/postalAddress&gt;</span>
+                     <span class="nt">&lt;postalSuburb&gt;</span>Salisbury<span class="nt">&lt;/postalSuburb&gt;</span>
+                     <span class="nt">&lt;postalCity&gt;</span>Brisbane<span class="nt">&lt;/postalCity&gt;</span>
+                     <span class="nt">&lt;postalState&gt;</span>QLD<span class="nt">&lt;/postalState&gt;</span>
+                     <span class="nt">&lt;postalCode&gt;</span>4107<span class="nt">&lt;/postalCode&gt;</span>
+                     <span class="nt">&lt;postalCountry&gt;</span>AU<span class="nt">&lt;/postalCountry&gt;</span>
+                     <span class="nt">&lt;phone1&gt;</span>131150<span class="nt">&lt;/phone1&gt;</span>
+                     <span class="nt">&lt;email&gt;</span>tntatl@temando.com<span class="nt">&lt;/email&gt;</span>
+                     <span class="nt">&lt;website&gt;</span>http://www.tntexpress.com.au/interaction/asps/trackdtl_tntau.asp<span class="nt">&lt;/website&gt;</span>
+                  <span class="nt">&lt;/carrier&gt;</span>
+               <span class="nt">&lt;/quote&gt;</span>
+            <span class="nt">&lt;/quotes&gt;</span>
+         <span class="nt">&lt;/request&gt;</span>
+      <span class="nt">&lt;/ns1:getRequestResponse&gt;</span>
+   <span class="nt">&lt;/SOAP-ENV:Body&gt;</span>
+<span class="nt">&lt;/SOAP-ENV:Envelope&gt;</span>
+</pre>
+
+<h3 id='child-content'>Child Content:</h3>
+
+<p>The details relating to a lodged request and associated quote/s.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Occurs</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>request</td>
+<td>complex</td>
+<td>Always</td>
+<td>The specific details for a request.</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+<soapenv:Envelope xmlns:ser="http://api-demo.temando.com/schema/2009_06/server.xsd" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Header>
+        <Security>
+            <UsernameToken>
+                <Username>username</Username>
+                <Password>password</Password>
+            </UsernameToken>
+        </Security>
+    </soapenv:Header>
+    <soapenv:Body>
+        <ser:getQuotes>
+            <anythings>
+                <anything>
+                    <class>General Goods</class>
+                    <subclass>Household Goods</subclass>
+                    <packaging>Box</packaging>
+                    <distanceMeasurementType>Centimetres</distanceMeasurementType>
+                    <weightMeasurementType>Grams</weightMeasurementType>
+                    <length>10</length>
+                    <width>10</width>
+                    <height>10</height>
+                    <weight>1000</weight>
+                    <quantity>1</quantity>
+                </anything>
+            </anythings>
+            <anywhere>
+                <itemNature>Domestic</itemNature>
+                <itemMethod>Door to Door</itemMethod>
+                <originCountry>AU</originCountry>
+                <originCode>4000</originCode>
+                <originSuburb>BRISBANE</originSuburb>
+                <originIs>Business</originIs>
+                <destinationCountry>AU</destinationCountry>
+                <destinationCode>3000</destinationCode>
+                <destinationSuburb>MELBOURNE</destinationSuburb>
+                <destinationIs>Residence</destinationIs>
+            </anywhere>
+        </ser:getQuotes>
+    </soapenv:Body>
+</soapenv:Envelope>

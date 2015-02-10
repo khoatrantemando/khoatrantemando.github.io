@@ -5,7 +5,7 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>SOAP API Reference</title>
+    <title>Soap API Reference</title>
 
     <link href="../assets/stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
     <link href="../assets/stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
@@ -38,7 +38,7 @@
       <div class="dark-box"></div>
       <div class="content row">
         <h1 id='getting-started'>Getting Started</h1><h2 id='a-idintroductionintroductiona'><a id="introduction">Introduction</a></h2>
-<p>This document is a quick start guide on how to integrate with Temando&rsquo;s SOAP services. </p>
+<p>This document is a quick start guide on how to integrate with Temando&rsquo;s Soap services. </p>
 
 <p>Using these services you can:</p>
 
@@ -51,25 +51,50 @@
 
 <p><strong><em>To use this document, you should have a basic familiarity with software development and web services</em></strong>.</p>
 
-<p>For more details, please refer to the <a href="/assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF" target="_blank">Developer Guide</a></p>
+<p>This document is structured like a cook book. We present common api methods and use cases which can be accessed through the navigation menu.</p>
 
-<p>If you have any questions or need help, please feel free to drop us a line at <a href="mailto:api-support@temando.com">api-support@temando.com</a></p>
+<p>For more details, please refer to the <a href="/assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF" target="_blank">Developer Guide</a>.</p>
+
+<p>If you have any questions or need help, please feel free to drop us a line at <a href="mailto:api-support@temando.com">api-support@temando.com</a>.</p>
 
 <h2 id='a-idcommon_processesprocesses-overviewa'><a id="common_processes">Processes Overview</a></h2>
-<p><img src="/assets/images/soap/process_overview.png"/></p>
+<p>The Temando fulfilment process consists of several interconnected steps that need to occur in sequence. A typical
+fulfilment process consists of the following steps: get quotes, make a booking, get manifest, confirm manifest, then track the booked consignment.</p>
 
-<p>A common scenario is:</p>
+<p>Combined, these steps will enable an integration to provide Temando powered fulfilment services that can offer your customers shipment
+quotes, bookings, as well as transfer these bookings to the chosen carrier (manifest). Temando will also enable the tracking of
+these packages by making accessible a consignment&rsquo;s full tracking history.</p>
+
+<p>From the customer perspective, the fulfilment process enables the following use case in a shopping cart scenario:</p>
 
 <ul>
-<li>User checks what quotes are available based on particular request parameters.</li>
-<li>User then books in a request with a carrier using one of the available quotes.</li>
-<li>If user account has manifesting set up with the carrier, then user runs <strong>get manifest</strong> to verify all booked shipments are ready for a particular date. This step is optional.</li>
-<li>User runs <strong>confirm manifest</strong> to confirm that all are ready.</li>
-<li>User tracks the items after they have been shipped.</li>
+<li>Customer selects an item from your store.</li>
+<li>Customer obtains a shipment quote by entering details about their desired delivery location, for example: suburb/city and post code.</li>
+<li>Customer presses &ldquo;Get a quote&rdquo; button, which will send a <a href="#getQuotes">getQuotes</a> request to Temando.</li>
+<li>Temando returns a list of possible quotes. This list depends on the number of carriers that were configured for the shopping cart client.</li>
+<li>Customer accepts the quote with a carrier.</li>
+<li>Customer pays for the order, which will send a <a href="#makeBooking">makeBooking</a> request to Temando.</li>
+<li>Temando sends a request to the selected carrier, which will start the process of shipping the product.</li>
+<li>Customer can track the order after they have been shipped, either through <a href="http://www.temando.com/education/track-your-item" target="_blank">Temando tracking portal</a> or through a portal built for your store.</li>
+</ul>
+
+<p><br/> 
+From the developer perspective, the fulfilment process enables the following use case:</p>
+
+<p><img src="/assets/images/soap/process_overview.png"/></p>
+
+<ul>
+<li>Your system can invoke Temando&rsquo;s <a href="#getQuotes">getQuotes</a> to check what quotes are available based on particular request parameters.</li>
+<li>Your system can invoke <a href="#makeBooking">makeBooking</a> to book in a request with a carrier using one of the available quotes.</li>
+<li>If your Temando account has <a href="#what-is-manifesting">manifesting</a> set up with the carrier, then your system can run <a href="#getManifest">getManifest</a> to verify all booked shipments are ready for a particular date. This step is optional.</li>
+<li>Your system can invoke <a href="#confirmManifest">confirmManifest</a> to confirm that all are ready.</li>
+<li>Your system can invoke <a href="#getRequest">getRequest</a> to track the items after they have been shipped.</li>
 </ul>
 
 <p>Below are detailed explanation of each of these steps. Note that examples of the actual elements and their values are available within the operation descriptions.</p>
-<h3 id='a-idprocess_getquotesstep-1---get-quotesa'><a id="process_getQuotes">Step 1 - Get Quotes</a></h3>
+<h3 id='a-idprocess_getquotesa'><a id="process_getQuotes"></a></h3>
+<p><strong>Step 1 - Get Quotes</strong></p>
+
 <p>The first step is to identify what quotes are available. To achieve this a call must be made to the <a href="#getQuotes">getQuotes</a> operation and provide the particulars of the request that needs to be sent. These particulars are grouped as follows:</p>
 
 <table><thead>
@@ -125,7 +150,9 @@
 <td>Information about the carrier service.</td>
 </tr>
 </tbody></table>
-<h3 id='a-idprocesses_makebookingstep-2---make-a-bookinga'><a id="processes_makeBooking">Step 2 - Make a Booking</a></h3>
+<h3 id='a-idprocesses_makebookinga'><a id="processes_makeBooking"></a></h3>
+<p><strong>Step 2 - Make a Booking</strong></p>
+
 <p>Once the available quotes have been provided and the required quote identified, a booking must be made to register the request and the identified quote. To achieve this a call must be made to the <a href="#makeBooking">makeBooking</a> operation. The information required for this call is grouped as follows:</p>
 
 <table><thead>
@@ -135,20 +162,8 @@
 </tr>
 </thead><tbody>
 <tr>
-<td><strong>Anythings</strong></td>
-<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
-</tr>
-<tr>
-<td><strong>Anywhere</strong></td>
-<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
-</tr>
-<tr>
-<td><strong>Anytime</strong></td>
-<td>This is the exact same details as what was provided in the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
-</tr>
-<tr>
-<td><strong>General</strong></td>
-<td>This is the exact same details as what was provided in the <a href="#get-processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+<td><strong>Anythings, Anywhere, Anytime, General</strong></td>
+<td>This is the exact same details as what was provided in the <a href="#process_getQuotes">Get Quotes</a> call in the previous step.</td>
 </tr>
 <tr>
 <td><strong>Origin</strong></td>
@@ -160,7 +175,7 @@
 </tr>
 <tr>
 <td><strong>Quote</strong></td>
-<td>This will include: <ul><li>The specific details about the accepted quote.</li><li>The extras to be included with the quote (eg. insurance, etc).</li></ul> These must match exactly with the details provided in the response to the <a href="#processes_getQuotes">Get Quotes</a> call in the previous step.</td>
+<td>This will include: <ul><li>The specific details about the accepted quote.</li><li>The extras to be included with the quote (eg. insurance, etc).</li></ul> These must match exactly with the details provided in the response to the <a href="#process_getQuotes">Get Quotes</a> call in the previous step.</td>
 </tr>
 <tr>
 <td><strong>Payment</strong></td>
@@ -201,25 +216,31 @@
 <td>This will include the consignment number, consignment document and document type. This is only provided if it was detailed as an inclusion for the quote that was accepted from step 1.</td>
 </tr>
 </tbody></table>
-<h3 id='a-idprocesses_manifestingstep-3---get-manifesta'><a id="processes_manifesting">Step 3 - Get Manifest</a></h3>
-<p>Manifesting is the process of confirming a collection of shipments are ready for pick up. This is only available if you have registered your pickup location for manifesting. For further information please see our section on <a href="#what-is-manifesting">What is Manifesting</a>.</p>
+<h3 id='a-idprocesses_manifestinga'><a id="processes_manifesting"></a></h3>
+<p><strong>Step 3 - Get Manifest</strong></p>
 
-<p>Before confirming a manifest it is likely you may want to verify that all shipments which have been booked are actually ready for pickup. The <a href="#getManifest">getManifest</a> operation can be called with the request type <strong>Awaiting Confirmation</strong> to get a list of items that would be confirmed by a <a href="#confirm-manifest">confirmManifest</a> call. Normally this would be physically checked against the items awaiting pick up before confirming the manifest.</p>
-<h3 id='a-idprocesses_confirmmanifeststep-4---confirm-manifesta'><a id="processes_confirmManifest">Step 4 - Confirm Manifest</a></h3>
-<p>Items which are ready for pickup can be confirmed by a call to the <a href="#confirmManifest">confirmManifest</a> operation. Doing so will cause Temando to ask the relevant carrier(s) to dispatch to your location for a pick up. Further, shipments can no longer be cancelled via a Temando API once this has been confirmed, as the carriers have been instructed to pickup the items. Cancellations must be negotiated with the carriers after a manifest has been confirmed. After a manifest is confirmed, it can be retrieved using the <a href="#getManifest">getManifest</a> operation with the request type <strong>Confirmed</strong>.</p>
-<h3 id='a-idprocesses_trackingstep-5---trackinga'><a id="processes_tracking">Step 5 - Tracking</a></h3>
+<p>Manifesting is the process of the merchant confirming that a collection of shipments are ready for pick up by a carrier. This is only available if you have registered your pickup location for manifesting. For further information, please see our section on <a href="#what-is-manifesting">What is Manifesting</a>.</p>
+
+<p>Before confirming a manifest it is likely you may want to verify that all shipments which have been booked are actually ready for pickup. The <a href="#getManifest">getManifest</a> operation can be called with the request type <strong>Awaiting Confirmation</strong> to get a list of items that would be confirmed by a <a href="#confirmManifest">confirmManifest</a> call.</p>
+<h3 id='a-idprocesses_confirmmanifesta'><a id="processes_confirmManifest"></a></h3>
+<p><strong>Step 4 - Confirm Manifest</strong></p>
+
+<p>Items which are ready for pickup can be confirmed by a call to the <a href="#confirmManifest">confirmManifest</a> operation. Doing so will cause Temando to ask the relevant carrier to dispatch to your location for a pick up. Further, shipments can no longer be cancelled via a Temando API once this has been confirmed, as the carrier has been instructed to pickup the items. Cancellations must be negotiated with the carrier after a manifest has been confirmed. After a manifest is confirmed, it can be retrieved using the <a href="#getManifest">getManifest</a> operation with the request type <strong>Confirmed</strong>.</p>
+<h3 id='a-idprocesses_trackinga'><a id="processes_tracking"></a></h3>
+<p><strong>Step 5 - Tracking</strong></p>
+
 <p>Tracking the status of a shipment can be performed by making a call to the <a href="#getRequest">getRequest</a> operation. This will return the request and associated details based on the supplied request id. </p>
 
 <p>The <a href="#getRequest">getRequest</a> operation can also be used to retrieve a label in case it wasn&rsquo;t captured in the <a href="#makeBooking">makeBooking</a> response.</p>
 
-<h2 id='a-idsoap_wsdlsoap-wsdla'><a id="soap_wsdl">Soap WSDL</a></h2>
-<p>To invoke the SOAP services, you need to load the wsdl file into your client application.</p>
+<h2 id='a-idsoap_wsdlsoap-wsdla'><a id="soap_wsdl">Soap Wsdl</a></h2>
+<p>To invoke the Soap services, you need to load the Wsdl file into your client application.</p>
 
-<p>Temando provides the SOAP services on 2 separate environments.
-You should test with the training environment during your application development / testing phases.
-After you&rsquo;ve completed testing your application against Temando&rsquo;s training environment, your application could be updated to point to Temando&rsquo;s production environment.</p>
+<p>Temando provides the Soap services on 2 separate environments.
+You should test with the demo environment during your application development / testing phases.
+After you&rsquo;ve completed testing, your application needs to be updated to point to Temando&rsquo;s production environment.</p>
 
-<p>The SOAP services wsdl are below:</p>
+<p>The Soap services locations are below:</p>
 
 <table><thead>
 <tr>
@@ -228,7 +249,7 @@ After you&rsquo;ve completed testing your application against Temando&rsquo;s tr
 </tr>
 </thead><tbody>
 <tr>
-<td>Training</td>
+<td>Demo</td>
 <td><a href="http://api-demo.temando.com/schema/2009_06/server.wsdl" target="_blank">http://api-demo.temando.com/schema/2009_06/server.wsdl</a></td>
 </tr>
 <tr>
@@ -237,19 +258,19 @@ After you&rsquo;ve completed testing your application against Temando&rsquo;s tr
 </tr>
 </tbody></table>
 
-<p>Training wsdl and production wsdl are almost the same, except for namespaces (one points to api-demo.temando.com and the other points to api.temando.com)</p>
+<p>Demo Wsdl and production Wsdl are almost the same, except for namespaces (one points to <em>api-demo.temando.com</em> and the other points to <em>api.temando.com</em>)</p>
 
 <h2 id='a-idapi_credentialsapi-credentialsa'><a id="api_credentials">API Credentials</a></h2>
 <p>To make calls to Temando API, you must have a client account with Temando.</p>
 
-<p>Each web service request needs to include the account&rsquo;s user name and password in the request header (see <a href="#api_overview">API Overview</a> for an example of a soap request message).</p>
+<p>Each web service request needs to include the account&rsquo;s user name and password in the request header (see <a href="#api_overview">API Overview</a> for an example of a Soap request message).</p>
 
-<p>For the training environment, the below accounts could be used:</p>
+<p>For the demo environment, the below accounts could be used:</p>
 
 <table><thead>
 <tr>
 <th>Client Id</th>
-<th>Username</th>
+<th>User name</th>
 <th>Password</th>
 </tr>
 </thead><tbody>
@@ -276,17 +297,36 @@ After you&rsquo;ve completed testing your application against Temando&rsquo;s tr
 </tbody></table>
 
 <p><aside class="warning">
-Note that there is a <a href="https://dashboard-demo.temando.com" target="_blank">Demo Dashboard</a> that allows viewing all bookings against an account.
-As these test accounts are shared, others could also see your test bookings. Please make sure that you do not include any sensitive data in your tests.
+As these accounts are shared, others could potentially see your test bookings. Please make sure that you do not include any sensitive data in your tests.
 </aside></p>
 
 <p>For production environment, please see the <a href="#create-api-account">FAQ</a></p>
 
-<h1 id='a-idcommon_use_casescommon-use-casesa'><a id="common_use_cases">Common Use Cases</a></h1><h2 id='use-case-1'>Use Case 1</h2>
-<p><strong>Getting quotes for a box to be sent from Brisbane to Melbourne.</strong></p>
+<h1 id='a-idsample_codesample-codea'><a id="sample_code">Sample Code</a></h1>
 
+<p>Below are sample codes in a number of common languages.
+They are intentionally simple to quickly demonstrate how to connect to Temando SOAP services, and might not follow best coding practices.
+Please modify them to adapt to your project&rsquo;s requirements.</p>
+
+<h2 id='a-idphpaphp'><a id="php"></a>PHP</h2>
+
+<p><a href="../assets/soap_samples/SampleCodePHP.zip">Download PHP Sample Code</a></p>
+
+<h2 id='a-idphpajava'><a id="php"></a>Java</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeJava.zip">Download Java Sample Code</a></p>
+
+<h2 id='a-idc-sharpac-c-sharp'><a id="c-sharp"></a>C# (C Sharp)</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeCS.zip">Download C# (C Sharp) Sample Code</a></p>
+
+<h2 id='a-idaspavb-script-asp'><a id="asp"></a>VB Script (ASP)</h2>
+
+<p><a href="../assets/soap_samples/SampleCodeClassicASP.zip">Download VB Script (ASP) Sample Code</a></p>
+
+<h1 id='a-idcommon_use_casesuse-cases-for-getquotesa'><a id="common_use_cases">Use Cases for getQuotes</a></h1><h2 id='brisbane-to-melbourne'>Brisbane to Melbourne</h2>
 <p>The full request xml could be found <a href="/assets/soap_samples/use_case_1.xml" target="_blank">here</a>.</p>
-<h2 id='use-case-2'>Use Case 2</h2>
+<h2 id='with-package-optimisation'>With Package Optimisation</h2>
 <p><strong>Getting quotes from the list of input carriers, for 2 packages, with packaging optimisation turned on.</strong></p>
 
 <p>The full request xml could be found <a href="/assets/soap_samples/use_case_2.xml" target="_blank">here</a>.</p>
@@ -374,20 +414,18 @@ As these test accounts are shared, others could also see your test bookings. Ple
 </thead><tbody>
 <tr>
 <td><strong>Cheapest</strong></td>
-<td>Only a single quote be returned, which will be the cheapest quote available. Can be used for getQuotes and makeBooking.</td>
+<td>Only a single quote be returned, which will be the cheapest quote available. Can be used for <a href="#getQuotes">getQuotes</a> and <a href="#makeBooking">makeBooking</a>.</td>
 </tr>
 <tr>
 <td><strong>Carriers Only</strong></td>
-<td>Only those quotes that match with the carrier details supplied in the QuoteFilter. Can be used for getQuotes.</td>
+<td>Only those quotes that match with the carrier details supplied in the QuoteFilter. Can be used for <a href="#getQuotes">getQuotes</a>.</td>
 </tr>
 <tr>
 <td><strong>Carrier Order</strong></td>
-<td>Only a single quote will be returned based off the order of the carrier details supplied in the QuoteFilter, with the first available quote matching the list being used. Can be used for getQuotes and makeBooking.</td>
+<td>Only a single quote will be returned based off the order of the carrier details supplied in the QuoteFilter, with the first available quote matching the list being used. Can be used for <a href="#getQuotes">getQuotes</a> and <a href="#makeBooking">makeBooking</a>.</td>
 </tr>
 </tbody></table>
-<h2 id='use-case-3'>Use Case 3</h2>
-<p><strong>Getting quotes for international shipping.</strong></p>
-
+<h2 id='international-shipping'>International Shipping</h2>
 <blockquote>
 <p>request extract</p>
 </blockquote>
@@ -452,28 +490,6 @@ As these test accounts are shared, others could also see your test bookings. Ple
 <li>The sum of <strong>goodsValue</strong> for all <strong>article</strong>s must be equal to <strong>goodsValue</strong> under <strong>general</strong></li>
 </ul>
 
-<h1 id='a-idsample_codesample-codea'><a id="sample_code">Sample Code</a></h1>
-
-<p>Below are sample codes in a number of common languages.
-They are intentionally simple to quickly demonstrate how to connect to Temando SOAP services, and might not follow best coding practices.
-Please modify them to adapt to your project&rsquo;s requirements.</p>
-
-<h2 id='a-idphpaphp'><a id="php"></a>PHP</h2>
-
-<p><a href="../assets/soap_samples/SampleCodePHP.zip">Download PHP Sample Code</a></p>
-
-<h2 id='a-idphpajava'><a id="php"></a>Java</h2>
-
-<p><a href="../assets/soap_samples/SampleCodeJava.zip">Download Java Sample Code</a></p>
-
-<h2 id='a-idc-sharpac-c-sharp'><a id="c-sharp"></a>C# (C Sharp)</h2>
-
-<p><a href="../assets/soap_samples/SampleCodeCS.zip">Download C# (C Sharp) Sample Code</a></p>
-
-<h2 id='a-idaspavb-script-asp'><a id="asp"></a>VB Script (ASP)</h2>
-
-<p><a href="../assets/soap_samples/SampleCodeClassicASP.zip">Download VB Script (ASP) Sample Code</a></p>
-
 <h1 id='a-idterminologyterminologya'><a id="terminology">Terminology</a></h1>
 
 <table><thead>
@@ -523,11 +539,11 @@ Please modify them to adapt to your project&rsquo;s requirements.</p>
 <td>Hyper Text Transfer Protocol</td>
 </tr>
 <tr>
-<td>SOAP</td>
+<td>Soap</td>
 <td>Simple Object Access Protocol - A Specification for XML-based communication.</td>
 </tr>
 <tr>
-<td>WSDL</td>
+<td>Wsdl</td>
 <td>Web Services Description Language - A specification for describing web services in terms of messages and operations.</td>
 </tr>
 <tr>
@@ -542,7 +558,8 @@ Please modify them to adapt to your project&rsquo;s requirements.</p>
 
 <h1 id='a-idfaqfrequently-asked-questionsa'><a id="faq">Frequently Asked Questions</a></h1>
 
-<p class="question"><a id="what-is-manifesting">What is Manifesting?</a></p>
+<p><a id="what-is-manifesting"></a>
+<p class="question">What is Manifesting?</p></p>
 
 <p>Manifesting is a service we can specifically enable for clients who have agreed to / meet certain volumes of freight and / or have arranged a permanent pick-up in place.  This service needs to be activated / enabled on your account per carrier(s) who support the manifesting capability.</p>
 
@@ -556,7 +573,8 @@ It is also important to be aware that when <strong>manifesting</strong> is enabl
 
 <p>Each <strong>Saved Address</strong> (origin) on your Temando Account should be assigned a unique <strong>Location</strong> entry in your manifesting portal. These are saved and sorted by the unique <strong>Reference</strong> description (which also links manifesting to your API).  The more saved addresses you have (even with the exact same details), the more origin points in your manifesting location list.</p>
 
-<p class="question"><a id="what-is-packaging-optimisation">What is Packaging Optimisation?</a></p>
+<p><a id="what-is-packaging-optimisation"></a>
+<p class="question">What is Packaging Optimisation?</p></p>
 
 <p>Temando&rsquo;s packaging logic / optimisation places the consolidated product dimensions, in the most relevant pre-configured package, in the respective Temando account.
 The logic takes into consideration both the spatial &amp; volumetric measurements.</p>
@@ -582,13 +600,13 @@ The logic takes into consideration both the spatial &amp; volumetric measurement
 
 <p><img title="Packacking" alt="Packaging" src="../assets/images/soap/packaging.png" /></p>
 
-<p>Alternatively if you calculate it cubically = Box01 = 45 x 45 x 35 = 70,875 cubic cm&hellip; made up of&hellip;</p>
+<p>Alternatively if you calculate it cubically = Box01 = 45 x 45 x 35 = 70,875 cubic cm, made up of:</p>
 
 <ul>
 <li>  10 articles consume 30 x 20 x 6 = 36,000 cubic cm</li>
-<li>  waste above the boxes = 6,000 cubic cm (30 x 40 x 5)</li>
-<li>  waste at the back of the boxes = 5,250 cubic cm (30 x 5 x 35)</li>
-<li>  waste to the right of the boxes = 23,625 cubic cm (15 x 35 x 45)</li>
+<li>  Waste above the boxes = 6,000 cubic cm (30 x 40 x 5)</li>
+<li>  Waste at the back of the boxes = 5,250 cubic cm (30 x 5 x 35)</li>
+<li>  Waste to the right of the boxes = 23,625 cubic cm (15 x 35 x 45)</li>
 </ul>
 
 <p class="question">What is the difference between getQuotes and getQuotesByRequest?</p>
@@ -612,10 +630,10 @@ The logic takes into consideration both the spatial &amp; volumetric measurement
 <p class="question" id="create-api-account">How do I create an account to use the API on production?</p>
 
 <p>First, you need to create an account via <a href="https://dashboard.temando.com" target="_blank">our website</a>.
-Once done, on the <em>My Details</em> section you will need to consider which <em>Account Type</em> i.e. payment method you would like to use for your transactions with our API.
+Once done, on the <em>My Details</em> section you will need to select which <em>Account Type</em> i.e. payment method you would like to use for your transactions with our API.
 Then please contact the Temando solution manager assigned to your account, and they will sort out the rest.</p>
 
-<p class="question">Is there a quick way to test Temando SOAP API without wring any code?</p>
+<p class="question">Is there a quick way to test Temando Soap API without wring any code?</p>
 
 <p>SoapUI is a well known tool for web service testing. A freeware version (including open source) is available for download from the internet.
 With this tool you will be able to replicate the requests and responses that you will send and receive when using the Temando API from a code base.
@@ -626,7 +644,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 <h1 id='a-idapi_overviewapi-overviewa'><a id="api_overview">API Overview</a></h1>
 
 <blockquote>
-<p>Example of a soap request message (<a href="#getRequest">getRequest</a> in this instance).</p>
+<p>Example of a Soap request message (<a href="#getRequest">getRequest</a> in this instance).</p>
 </blockquote>
 
 <pre class="highlight xml">1.  <span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
@@ -653,7 +671,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 22. <span class="nt">&lt;/soapenv:Envelope&gt;</span>
 </pre>
 
-<p>Communication with the API uses a simple request/response protocol based on SOAP requests over a HTTP transport layer. The request message is submitted to the API server with a POST request to the API URI - the server responds with the response message as the content body.</p>
+<p>Communication with the API uses a simple request/response protocol based on Soap requests over a HTTP transport layer. The request message is submitted to the API server with a POST request to the API URI - the server responds with the response message as the content body.</p>
 
 <p>Currently the only recognized header is the WS-Security Security header.</p>
 
@@ -669,15 +687,15 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 </tr>
 <tr>
 <td>Lines 2-5, 22</td>
-<td>SOAP envelope wrapper - top-level document element.</td>
+<td>Soap envelope wrapper - top-level document element.</td>
 </tr>
 <tr>
 <td>Lines 6-14</td>
-<td>SOAP headers. must be specified in all requests.</td>
+<td>Soap headers. must be specified in all requests.</td>
 </tr>
 <tr>
 <td>Liners 15,21</td>
-<td>SOAP body. Contains the actual request message from one of the operations defined in this document.</td>
+<td>Soap body. Contains the actual request message from one of the operations defined in this document.</td>
 </tr>
 <tr>
 <td>Lines 16-20</td>
@@ -685,16 +703,16 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 </tr>
 </tbody></table>
 
-<p>The response body is similar but does not currently include any SOAP headers.</p>
+<p>The response body is similar but does not currently include any Soap headers.</p>
 
 <h2 id='error-handling'>Error Handling</h2>
 
-<p>Errors caused by an invalid request message will generate a SOAP fault in the response body and the operation will have no further effect (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a> for a list of standard fault codes).</p>
+<p>Errors caused by an invalid request message will generate a Soap fault in the response body and the operation will have no further effect (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a> for a list of standard fault codes).</p>
 
 <h2 id='a-idauthenticationauser-authentication'><a id="Authentication"></a>User Authentication</h2>
 
 <blockquote>
-<p>Example WS-Security header block (occurs within the SOAP header):</p>
+<p>Example WS-Security header block (occurs within the Soap header):</p>
 </blockquote>
 
 <pre class="highlight xml"><span class="nt">&lt;wsse:Security</span> <span class="na">xmlns:wsse=</span><span class="s">"http://schemas.xmlsoap.org/ws/2002/04/secext"</span><span class="nt">&gt;</span>
@@ -721,11 +739,11 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 <span class="nt">&lt;/soap-env:Envelope&gt;</span>
 </pre>
 
-<p>User authentication is performed using the WS-Security standard SOAP headers, which must be included in every request message. Presently only username/password authentication is supported; however support for SSL certificate based authentication and signed xml are intended for a future release. Users may further be restricted by IP address.</p>
+<p>User authentication is performed using the WS-Security standard Soap headers, which must be included in every request message. Presently only username/password authentication is supported; however support for SSL certificate based authentication and signed xml are intended for a future release. Users may further be restricted by IP address.</p>
 
 <p>An accepted security header consists of a single Security element containing exactly one <strong>UsernameToken</strong>, which in turn contains <strong>Username</strong> and <strong>Password</strong> elements. The <strong>Username</strong> and <strong>Password</strong> elements in turn supply the user credentials in plain text (for this reason, an SSL connection is required for transport-level security).</p>
 
-<p>If authentication fails for whatever reason, the server will return a <strong>SOAP Fault</strong> indicating the failure as defined within section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>.</p>
+<p>If authentication fails for whatever reason, the server will return a <strong>Soap Fault</strong> indicating the failure as defined within section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>.</p>
 
 <h2 id='general'>General</h2>
 
@@ -743,7 +761,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>On success, the response is an empty createLocationResponse.</p>
 
-<p>Otherwise, a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>Otherwise, a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idcreatelocation_requestarequest'><a id="createLocation_Request"></a>Request</h2>
 
@@ -838,7 +856,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The getLocations operation returns a list of locations against a client id. The list could also be filtered by location description location type.</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idgetlocations_requestarequest'><a id="getLocations_Request"></a>Request</h2>
 
@@ -961,7 +979,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The response is a getQuotesResponse, and contains a list of all available quotes. Quote results are not listed in any particular order.</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idgetquotesarequest'><a id="getQuotes"></a>Request</h2>
 
@@ -1267,7 +1285,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The response message is a makeBookingResponse, and contains a request id.</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idmakebooking-requestarequest'><a id="makeBooking-Request"></a>Request</h2>
 
@@ -1732,7 +1750,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The response message is a getManifestResponse, and contains the manifest documents (and label documents, if requested).</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idgetmanifest-requestarequest'><a id="getManifest-Request"></a>Request</h2>
 
@@ -2151,7 +2169,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The response message is a confirmManifestResponse, and contains the manifest documents (and label documents, if requested).</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idconfirmmanifest-requestarequest'><a id="confirmManifest-Request"></a>Request</h2>
 
@@ -2567,7 +2585,7 @@ The soapUI tool is available from <a href="http://www.soapui.org/" target="_blan
 
 <p>The response message is a getRequestResponse, and contains all information relating to a request.</p>
 
-<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 SOAP Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
+<p>If a query contains invalid data then a SoapFault is thrown with the details of the exception (see section 2.6 Soap Faults in the <a href="../assets/docs/Temando_API_R1_17_Developers_Guide_CA.PDF">Developer Guide</a>).</p>
 
 <h2 id='a-idgetrequest-requestarequest'><a id="getRequest-Request"></a>Request</h2>
 
